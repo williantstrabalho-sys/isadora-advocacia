@@ -143,27 +143,27 @@ export default async function HomePage() {
               </div>
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
                 <Card>
-                  <CardContent className="flex items-center gap-3 p-5">
-                    <GraduationCap className="h-6 w-6 text-brand-accent" />
+                  <CardContent className="flex items-start gap-3 p-5">
+                    <GraduationCap className="h-6 w-6 shrink-0 text-brand-accent" />
                     <div>
-                      <p className="text-sm font-medium text-brand-text">
-                        Formação em Direito
+                      <p className="text-xs uppercase tracking-wide text-brand-muted">
+                        Pós-graduação
                       </p>
-                      <p className="text-xs text-brand-muted">
-                        Pós-graduação em Direito do Trabalho
+                      <p className="mt-0.5 text-sm font-medium text-brand-text">
+                        Direito e Processo do Trabalho e Direito Previdenciário
                       </p>
                     </div>
                   </CardContent>
                 </Card>
                 <Card>
-                  <CardContent className="flex items-center gap-3 p-5">
-                    <Scale className="h-6 w-6 text-brand-accent" />
+                  <CardContent className="flex items-start gap-3 p-5">
+                    <GraduationCap className="h-6 w-6 shrink-0 text-brand-accent" />
                     <div>
-                      <p className="text-sm font-medium text-brand-text">
-                        Atuação trabalhista
+                      <p className="text-xs uppercase tracking-wide text-brand-muted">
+                        Pós-graduação
                       </p>
-                      <p className="text-xs text-brand-muted">
-                        Foco em direitos do trabalhador
+                      <p className="mt-0.5 text-sm font-medium text-brand-text">
+                        Arbitragem e Mediação de Conflitos
                       </p>
                     </div>
                   </CardContent>
