@@ -58,7 +58,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <div className="flex flex-1 items-center self-stretch border-b border-brand-border -mr-5 pr-5 sm:-mr-6 sm:pr-6 lg:-mr-10 lg:pr-10 xl:-mr-14 xl:pr-14 2xl:-mr-20 2xl:pr-20">
+        <div className="relative flex flex-1 items-center self-stretch -mr-5 pr-5 after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-[linear-gradient(to_right,transparent,#2a2a2a_14%)] sm:-mr-6 sm:pr-6 lg:-mr-10 lg:pr-10 xl:-mr-14 xl:pr-14 2xl:-mr-20 2xl:pr-20">
           <nav className="hidden items-center gap-7 md:flex">
             {NAV.map((item) => (
               <Link

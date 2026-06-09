@@ -28,7 +28,8 @@
       "Bash(curl -s -o /dev/null -w \"hero img => %{http_code}\\\\n\" \"http://localhost:3000/isadora-hero.png\")",
       "PowerShell($dir = \"C:\\\\Users\\\\willian\\\\Desktop\\\\Site Isadora - Advocacia Trabalhista\\\\supabase\"; Add-Content -Path \"$dir\\\\full_setup.sql\" -Value \"`n-- >>> 0005_contatos_telefone.sql >>>`n\" -Encoding utf8; Get-Content \"$dir\\\\migrations\\\\0005_contatos_telefone.sql\" -Raw | Add-Content -Path \"$dir\\\\full_setup.sql\" -Encoding utf8; \"full_setup.sql atualizado\")",
       "Bash(curl -s -o /dev/null -w \"sobre img => %{http_code}\\\\n\" \"http://localhost:3000/isadora-sobre.jpg\")",
-      "WebFetch(domain:isadora-advocacia.vercel.app)"
+      "WebFetch(domain:isadora-advocacia.vercel.app)",
+      "Bash(curl -s -o /dev/null \"http://localhost:3000/\")"
     ]
   }
 }
