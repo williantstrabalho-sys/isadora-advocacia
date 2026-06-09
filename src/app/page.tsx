@@ -57,7 +57,7 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-brand-bg via-transparent to-brand-bg/40" />
           </div>
 
-          <div className="container relative z-10 py-24 md:py-32">
+          <div className="container relative z-10 py-14 md:py-24">
             <div className="max-w-xl">
               <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-brand-text md:text-6xl">
                 Defesa técnica dos seus{" "}

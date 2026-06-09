@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/#especialidades", label: "Especialidades" },
@@ -16,20 +17,41 @@ const NAV = [
 
 export function SiteHeader() {
   const [aberto, setAberto] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-brand-border bg-brand-bg/80 backdrop-blur">
-      <div className="container flex h-16 items-center gap-6 sm:h-20 sm:gap-10">
-        {/* Logo em placa branca, alinhada à esquerda. No desktop ela é maior
-            que a barra e transborda para baixo (self-start + z-10); no celular
-            fica contida na barra para não quebrar o layout. */}
+      <div
+        className={cn(
+          "container flex items-center gap-6 transition-all duration-300 sm:gap-10",
+          scrolled ? "h-16 sm:h-20" : "h-24 sm:h-32"
+        )}
+      >
+        {/* Logo grande no topo; encolhe ao rolar para não atrapalhar a leitura */}
         <Link
           href="/"
           aria-label="Página inicial"
-          className="relative z-10 shrink-0 self-center sm:self-start"
+          className="shrink-0"
         >
-          <span className="flex items-center justify-center rounded-lg bg-gradient-to-b from-brand-elevated to-brand-surface px-3 py-1.5 shadow-lg shadow-[0_8px_30px_-8px_rgba(212,105,30,0.35)] ring-1 ring-brand-accent/30 transition-shadow duration-300 hover:ring-brand-accent/60 hover:shadow-[0_8px_36px_-6px_rgba(212,105,30,0.5)] sm:px-5 sm:py-3">
-            <Logo className="h-10 w-auto sm:h-20" />
+          <span
+            className={cn(
+              "flex items-center justify-center rounded-lg bg-gradient-to-b from-brand-elevated to-brand-surface shadow-lg shadow-[0_8px_30px_-8px_rgba(212,105,30,0.35)] ring-1 ring-brand-accent/30 transition-all duration-300 hover:ring-brand-accent/60",
+              scrolled ? "p-1.5 sm:p-2" : "p-2 sm:p-3"
+            )}
+          >
+            <Logo
+              className={cn(
+                "w-auto transition-all duration-300",
+                scrolled ? "h-10 sm:h-14" : "h-16 sm:h-24"
+              )}
+            />
           </span>
         </Link>
 

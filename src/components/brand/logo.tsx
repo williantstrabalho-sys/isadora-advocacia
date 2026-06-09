@@ -19,8 +19,8 @@ export function Logo({
     <Image
       src="/logo.png"
       alt="Isadora Gonçalves — Advocacia e Consultoria Jurídica"
-      width={220}
-      height={220}
+      width={1494}
+      height={946}
       priority
       className={cn("h-14 w-auto object-contain", className)}
     />
