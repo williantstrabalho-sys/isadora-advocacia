@@ -37,19 +37,14 @@ export function SiteHeader() {
           aria-label="Página inicial"
           className="relative z-50 shrink-0 self-start"
         >
-          <span
+          {/* Logo solta sobre a barra (sem placa/moldura), apenas com uma sombra
+              suave — assim não há linha/caixa que pareça cortar a logo. */}
+          <Logo
             className={cn(
-              "flex items-center justify-center rounded-lg bg-gradient-to-b from-brand-elevated to-brand-surface shadow-lg shadow-[0_10px_30px_-8px_rgba(212,105,30,0.4)] ring-1 ring-brand-accent/30 transition-all duration-300 hover:ring-brand-accent/60",
-              scrolled ? "p-2" : "p-2 sm:p-3"
+              "w-auto drop-shadow-[0_3px_8px_rgba(0,0,0,0.55)] transition-all duration-300",
+              scrolled ? "h-12 sm:h-16" : "h-16 sm:h-24"
             )}
-          >
-            <Logo
-              className={cn(
-                "w-auto transition-all duration-300",
-                scrolled ? "h-11 sm:h-16" : "h-16 sm:h-24"
-              )}
-            />
-          </span>
+          />
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex">
