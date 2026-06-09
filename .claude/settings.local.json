@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "PowerShell($v = \\(Get-Content \"node_modules/@supabase/supabase-js/package.json\" | ConvertFrom-Json\\).version; Write-Output \"supabase-js: $v\"; $v2 = \\(Get-Content \"node_modules/@supabase/ssr/package.json\" | ConvertFrom-Json\\).version; Write-Output \"ssr: $v2\")",
+      "PowerShell($env:NEXT_PUBLIC_SUPABASE_URL=\"https://placeholder.supabase.co\"; $env:NEXT_PUBLIC_SUPABASE_ANON_KEY=\"placeholder-anon-key\"; npx next build 2>&1 | Select-Object -Last 50)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(curl -s -o /tmp/home.html -w \"%{http_code}\" http://localhost:3000/)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"HTTP /login => %{http_code}\\\\n\" http://localhost:3000/login)",
+      "Bash(curl -s -o /dev/null -w \"HTTP /blog => %{http_code}\\\\n\" http://localhost:3000/blog)",
+      "Bash(curl -s -o /dev/null -w \"HTTP /politica-privacidade => %{http_code}\\\\n\" http://localhost:3000/politica-privacidade)",
+      "Bash(curl -s -o /dev/null -w \"HTTP /dashboard => %{http_code} -> %{redirect_url}\\\\n\" http://localhost:3000/dashboard)",
+      "Bash(curl -s -o /dev/null -w \"HTTP /portal => %{http_code} -> %{redirect_url}\\\\n\" http://localhost:3000/portal)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(powershell -Command 'Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '\\\\''*next dev*'\\\\'' -or $_.CommandLine -like '\\\\''*next-router-worker*'\\\\'' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }; Start-Sleep -Seconds 1; $c = \\(Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue\\); if \\($c\\) { '\\\\''still listening'\\\\'' } else { '\\\\''port 3000 free'\\\\'' }')",
+      "Bash(curl -s -o /dev/null -w \"HTTP / => %{http_code} \\(%{time_total}s\\)\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"warm / => %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"logo => %{http_code}\\\\n\" http://localhost:3000/logo.png)",
+      "Bash(curl -s -o /dev/null -w \"/ => %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"/login => %{http_code}\\\\n\" http://localhost:3000/login)",
+      "Bash(curl -s -o /dev/null -w \"/logo.png => %{http_code}\\\\n\" http://localhost:3000/logo.png)",
+      "Bash(curl -s -o /dev/null -w \"home %%{http_code}\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null http://localhost:3000/login)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\willian\\\\Desktop\\\\Site Isadora - Advocacia Trabalhista\" -File | Where-Object { $_.Extension -match '\\\\.\\(png|jpg|jpeg|webp|avif\\)$' } | Select-Object Name, Length, LastWriteTime)",
+      "Bash(curl -s -o /dev/null -w \"hero img => %{http_code}\\\\n\" \"http://localhost:3000/isadora-hero.png\")",
+      "PowerShell($dir = \"C:\\\\Users\\\\willian\\\\Desktop\\\\Site Isadora - Advocacia Trabalhista\\\\supabase\"; Add-Content -Path \"$dir\\\\full_setup.sql\" -Value \"`n-- >>> 0005_contatos_telefone.sql >>>`n\" -Encoding utf8; Get-Content \"$dir\\\\migrations\\\\0005_contatos_telefone.sql\" -Raw | Add-Content -Path \"$dir\\\\full_setup.sql\" -Encoding utf8; \"full_setup.sql atualizado\")",
+      "Bash(curl -s -o /dev/null -w \"sobre img => %{http_code}\\\\n\" \"http://localhost:3000/isadora-sobre.jpg\")"
+    ]
+  }
+}

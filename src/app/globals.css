@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-brand-bg text-brand-text antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Scrollbar dark minimalista */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a3a;
+  }
+}
+
+@layer components {
+  /* Tipografia para conteúdo markdown do blog */
+  .prose-brand {
+    @apply text-brand-text leading-relaxed;
+  }
+  .prose-brand h1 {
+    @apply text-3xl font-bold mt-8 mb-4 font-display;
+  }
+  .prose-brand h2 {
+    @apply text-2xl font-semibold mt-8 mb-3 font-display;
+  }
+  .prose-brand h3 {
+    @apply text-xl font-semibold mt-6 mb-2;
+  }
+  .prose-brand p {
+    @apply my-4 text-brand-text/90;
+  }
+  .prose-brand ul {
+    @apply my-4 list-disc pl-6 space-y-1;
+  }
+  .prose-brand ol {
+    @apply my-4 list-decimal pl-6 space-y-1;
+  }
+  .prose-brand a {
+    @apply text-brand-accent underline underline-offset-2 hover:text-brand-accent-hover;
+  }
+  .prose-brand blockquote {
+    @apply border-l-2 border-brand-accent pl-4 italic text-brand-muted my-4;
+  }
+  .prose-brand code {
+    @apply bg-brand-elevated px-1.5 py-0.5 rounded text-sm;
+  }
+  .prose-brand strong {
+    @apply text-brand-text font-semibold;
+  }
+}
