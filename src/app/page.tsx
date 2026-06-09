@@ -171,14 +171,14 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-xs sm:max-w-sm lg:mx-0 lg:ml-auto">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-lg border border-brand-border bg-brand-surface">
+            <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
+              <div className="relative aspect-[3/2] overflow-hidden rounded-lg border border-brand-border bg-brand-surface">
                 <Image
-                  src="/isadora-sobre.jpg"
+                  src="/isadora-sobre.png"
                   alt={`${cfg.advogada_nome} — ${cfg.oab}`}
                   fill
-                  sizes="(max-width: 1024px) 80vw, 384px"
-                  className="object-cover object-top"
+                  sizes="(max-width: 1024px) 90vw, 50vw"
+                  className="object-cover object-center"
                 />
                 {/* legenda com leve degradê na base */}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
