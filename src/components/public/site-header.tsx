@@ -28,28 +28,25 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-brand-border bg-brand-bg/80 backdrop-blur">
-      <div
-        className={cn(
-          "container flex items-center gap-6 transition-all duration-300 sm:gap-10",
-          scrolled ? "h-16 sm:h-20" : "h-24 sm:h-32"
-        )}
-      >
-        {/* Logo grande no topo; encolhe ao rolar para não atrapalhar a leitura */}
+      {/* Barra ESTREITA e de altura FIXA (não muda no scroll) — assim a página
+          não reflui e a logo não "treme". A logo transborda a barra (self-start)
+          e apenas ela muda de tamanho ao rolar, sempre sobressaindo. */}
+      <div className="container flex h-12 items-center gap-6 sm:h-14 sm:gap-10">
         <Link
           href="/"
           aria-label="Página inicial"
-          className="shrink-0"
+          className="relative z-50 shrink-0 self-start"
         >
           <span
             className={cn(
-              "flex items-center justify-center rounded-lg bg-gradient-to-b from-brand-elevated to-brand-surface shadow-lg shadow-[0_8px_30px_-8px_rgba(212,105,30,0.35)] ring-1 ring-brand-accent/30 transition-all duration-300 hover:ring-brand-accent/60",
-              scrolled ? "p-1.5 sm:p-2" : "p-2 sm:p-3"
+              "flex items-center justify-center rounded-lg bg-gradient-to-b from-brand-elevated to-brand-surface shadow-lg shadow-[0_10px_30px_-8px_rgba(212,105,30,0.4)] ring-1 ring-brand-accent/30 transition-all duration-300 hover:ring-brand-accent/60",
+              scrolled ? "p-2" : "p-2 sm:p-3"
             )}
           >
             <Logo
               className={cn(
                 "w-auto transition-all duration-300",
-                scrolled ? "h-10 sm:h-14" : "h-16 sm:h-24"
+                scrolled ? "h-11 sm:h-16" : "h-16 sm:h-24"
               )}
             />
           </span>
