@@ -16,6 +16,7 @@ import {
   Newspaper,
   Quote,
   BookOpen,
+  UserCog,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,7 @@ const ICONS: Record<string, LucideIcon> = {
   Newspaper,
   Quote,
   BookOpen,
+  UserCog,
 };
 
 export type IconName = keyof typeof ICONS;

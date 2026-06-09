@@ -15,6 +15,7 @@ const NAV: NavItem[] = [
   { href: "/dashboard/mensagens", label: "Mensagens", icon: "MessageSquare" },
   { href: "/dashboard/blog", label: "Blog", icon: "Newspaper" },
   { href: "/dashboard/depoimentos", label: "Depoimentos", icon: "Quote" },
+  { href: "/dashboard/equipe", label: "Equipe", icon: "UserCog" },
   { href: "/dashboard/configuracoes", label: "Configurações", icon: "Settings" },
 ];
 
