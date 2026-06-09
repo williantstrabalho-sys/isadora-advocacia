@@ -41,18 +41,18 @@ export default async function HomePage() {
           {/* Foto da advogada — alinhada à direita */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-3/5 lg:w-1/2"
+            className="pointer-events-none absolute inset-y-0 right-0 w-[78%] sm:w-3/5 lg:w-1/2"
           >
             <Image
               src="/isadora-hero.png"
               alt="Isadora Gonçalves"
               fill
               priority
-              sizes="(max-width: 640px) 100vw, 50vw"
-              className="object-cover object-top"
+              sizes="(max-width: 640px) 78vw, 50vw"
+              className="object-cover object-[35%_top] sm:object-top"
             />
             {/* Degradê à esquerda para o texto não conflitar com a imagem */}
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-bg via-brand-bg/85 to-transparent sm:via-brand-bg/55" />
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-bg via-brand-bg/80 to-transparent sm:via-brand-bg/55" />
             {/* Suaviza topo e base */}
             <div className="absolute inset-0 bg-gradient-to-t from-brand-bg via-transparent to-brand-bg/40" />
           </div>
