@@ -36,7 +36,7 @@ values (
   'OAB/DF 76.416',
   'contato@isadoragoncalves.adv.br',
   '(61) 9 8441-1723',
-  'QND 26, Lote 15, Taguatinga Norte, Brasília/DF'
+  'Brasília/DF'
 )
 on conflict (id) do nothing;
 

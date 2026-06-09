@@ -1,18 +1,16 @@
-﻿-- ============================================================================
--- SETUP COMPLETO — cole tudo no SQL Editor do Supabase e execute (Run).
--- Gerado a partir de supabase/migrations/*.sql
 -- ============================================================================
-
+-- SETUP COMPLETO — cole tudo no SQL Editor do Supabase e execute (Run).
+-- Gerado automaticamente a partir de supabase/migrations/*.sql (UTF-8).
+-- ============================================================================
 
 
 -- >>> 0001_schema.sql >>>
-
 -- ============================================================================
--- Isadora GonÃ§alves Advocacia â€” Schema principal
--- Direito Trabalhista | BrasÃ­lia/DF
+-- Isadora Gonçalves Advocacia — Schema principal
+-- Direito Trabalhista | Brasília/DF
 -- ============================================================================
--- ExtensÃµes necessÃ¡rias
-create extension if not exists "pgcrypto" with schema public;        -- criptografia de dados sensÃ­veis (CPF, CTPS)
+-- Extensões necessárias
+create extension if not exists "pgcrypto" with schema public;        -- criptografia de dados sensíveis (CPF, CTPS)
 create extension if not exists "uuid-ossp" with schema public;
 
 -- ----------------------------------------------------------------------------
@@ -52,9 +50,9 @@ exception when duplicate_object then null; end $$;
 
 -- ----------------------------------------------------------------------------
 -- CHAVE DE CRIPTOGRAFIA (pgcrypto)
--- Em produÃ§Ã£o, defina app.settings.crypto_key via:
+-- Em produção, defina app.settings.crypto_key via:
 --   alter database postgres set app.crypto_key = 'CHAVE_FORTE_AQUI';
--- Aqui usamos uma funÃ§Ã£o que lÃª o GUC com fallback para desenvolvimento.
+-- Aqui usamos uma função que lê o GUC com fallback para desenvolvimento.
 -- ----------------------------------------------------------------------------
 create or replace function public.crypto_key()
 returns text
@@ -63,7 +61,7 @@ stable
 as $$
   select coalesce(
     current_setting('app.crypto_key', true),
-    'dev-only-change-me-32bytes-key!!'  -- fallback DEV â€” troque em produÃ§Ã£o
+    'dev-only-change-me-32bytes-key!!'  -- fallback DEV — troque em produção
   );
 $$;
 
@@ -101,7 +99,7 @@ create table if not exists public.profiles (
   created_at  timestamptz not null default now()
 );
 
--- FunÃ§Ã£o helper: verdadeira se o usuÃ¡rio autenticado Ã© advogada
+-- Função helper: verdadeira se o usuário autenticado é advogada
 create or replace function public.is_advogada()
 returns boolean
 language sql
@@ -122,7 +120,7 @@ $$;
 create table if not exists public.clientes (
   id                uuid primary key default uuid_generate_v4(),
   advogada_id       uuid not null references public.profiles(id) on delete cascade,
-  profile_id        uuid references public.profiles(id) on delete set null, -- vÃ­nculo p/ login do cliente
+  profile_id        uuid references public.profiles(id) on delete set null, -- vínculo p/ login do cliente
   nome              text not null,
   cpf_enc           text,                  -- criptografado (pgcrypto)
   email             text,
@@ -233,7 +231,7 @@ create table if not exists public.agenda (
 );
 
 -- ----------------------------------------------------------------------------
--- TABELA: blog_posts  (pÃºblico quando publicado = true)
+-- TABELA: blog_posts  (público quando publicado = true)
 -- ----------------------------------------------------------------------------
 create table if not exists public.blog_posts (
   id          uuid primary key default uuid_generate_v4(),
@@ -242,13 +240,13 @@ create table if not exists public.blog_posts (
   resumo      text,
   conteudo    text,                 -- markdown
   autor       text,
-  tags        text[] default '{}',  -- "CLT","TST","SÃºmulas","NR","Reforma Trabalhista"
+  tags        text[] default '{}',  -- "CLT","TST","Súmulas","NR","Reforma Trabalhista"
   publicado   boolean not null default false,
   created_at  timestamptz not null default now()
 );
 
 -- ----------------------------------------------------------------------------
--- TABELA: contatos  (formulÃ¡rio pÃºblico â€” com consentimento LGPD)
+-- TABELA: contatos  (formulário público — com consentimento LGPD)
 -- ----------------------------------------------------------------------------
 create table if not exists public.contatos (
   id            uuid primary key default uuid_generate_v4(),
@@ -261,7 +259,7 @@ create table if not exists public.contatos (
 );
 
 -- ----------------------------------------------------------------------------
--- ÃNDICES
+-- ÍNDICES
 -- ----------------------------------------------------------------------------
 create index if not exists idx_clientes_advogada   on public.clientes(advogada_id);
 create index if not exists idx_clientes_profile     on public.clientes(profile_id);
@@ -277,15 +275,14 @@ create index if not exists idx_blog_slug             on public.blog_posts(slug);
 
 
 -- >>> 0002_rls.sql >>>
-
 -- ============================================================================
--- Row Level Security â€” TODAS as tabelas
+-- Row Level Security — TODAS as tabelas
 -- Regra geral:
---   * advogada (public.is_advogada()) enxerga/gerencia tudo do escritÃ³rio
---   * cliente sÃ³ enxerga os prÃ³prios dados (via profile_id -> clientes)
+--   * advogada (public.is_advogada()) enxerga/gerencia tudo do escritório
+--   * cliente só enxerga os próprios dados (via profile_id -> clientes)
 -- ============================================================================
 
--- Helper: ids de clientes vinculados ao usuÃ¡rio autenticado
+-- Helper: ids de clientes vinculados ao usuário autenticado
 create or replace function public.my_cliente_ids()
 returns setof uuid
 language sql
@@ -362,7 +359,7 @@ create policy "mov_cliente_select" on public.movimentacoes
   );
 
 -- ----------------------------------------------------------------------------
--- documentos  (acesso a arquivo apenas via URL assinada â€” Storage RLS abaixo)
+-- documentos  (acesso a arquivo apenas via URL assinada — Storage RLS abaixo)
 -- ----------------------------------------------------------------------------
 drop policy if exists "docs_advogada_all" on public.documentos;
 create policy "docs_advogada_all" on public.documentos
@@ -372,7 +369,7 @@ drop policy if exists "docs_cliente_select" on public.documentos;
 create policy "docs_cliente_select" on public.documentos
   for select using (cliente_id in (select public.my_cliente_ids()));
 
--- Cliente pode subir documentos dos prÃ³prios processos
+-- Cliente pode subir documentos dos próprios processos
 drop policy if exists "docs_cliente_insert" on public.documentos;
 create policy "docs_cliente_insert" on public.documentos
   for insert with check (
@@ -381,7 +378,7 @@ create policy "docs_cliente_insert" on public.documentos
   );
 
 -- ----------------------------------------------------------------------------
--- mensagens  (cliente vÃª apenas as suas; advogada vÃª todas)
+-- mensagens  (cliente vê apenas as suas; advogada vê todas)
 -- ----------------------------------------------------------------------------
 drop policy if exists "msg_advogada_all" on public.mensagens;
 create policy "msg_advogada_all" on public.mensagens
@@ -426,7 +423,7 @@ create policy "agenda_advogada_all" on public.agenda
   for all using (public.is_advogada()) with check (public.is_advogada());
 
 -- ----------------------------------------------------------------------------
--- blog_posts  (leitura pÃºblica apenas se publicado; escrita sÃ³ advogada)
+-- blog_posts  (leitura pública apenas se publicado; escrita só advogada)
 -- ----------------------------------------------------------------------------
 drop policy if exists "blog_public_select" on public.blog_posts;
 create policy "blog_public_select" on public.blog_posts
@@ -437,7 +434,7 @@ create policy "blog_advogada_write" on public.blog_posts
   for all using (public.is_advogada()) with check (public.is_advogada());
 
 -- ----------------------------------------------------------------------------
--- contatos  (qualquer um insere com consentimento; sÃ³ advogada lÃª)
+-- contatos  (qualquer um insere com consentimento; só advogada lê)
 -- ----------------------------------------------------------------------------
 drop policy if exists "contatos_insert_public" on public.contatos;
 create policy "contatos_insert_public" on public.contatos
@@ -449,14 +446,13 @@ create policy "contatos_advogada_select" on public.contatos
 
 
 -- >>> 0003_triggers_storage.sql >>>
-
 -- ============================================================================
--- Triggers, Storage e funÃ§Ãµes LGPD
+-- Triggers, Storage e funções LGPD
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- Auto-criaÃ§Ã£o de profile ao registrar usuÃ¡rio no Auth.
--- role e nome vÃªm de raw_user_meta_data (definidos no signUp / seed).
+-- Auto-criação de profile ao registrar usuário no Auth.
+-- role e nome vêm de raw_user_meta_data (definidos no signUp / seed).
 -- ----------------------------------------------------------------------------
 create or replace function public.handle_new_user()
 returns trigger
@@ -484,10 +480,10 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- ----------------------------------------------------------------------------
--- STORAGE â€” bucket privado "documentos"
+-- STORAGE — bucket privado "documentos"
 -- Acesso ao arquivo SEMPRE via URL assinada (gerada no server). RLS abaixo
--- garante que o cliente sÃ³ acesse objetos sob o prefixo dos seus processos.
--- ConvenÃ§Ã£o de path: documentos/<cliente_id>/<arquivo>
+-- garante que o cliente só acesse objetos sob o prefixo dos seus processos.
+-- Convenção de path: documentos/<cliente_id>/<arquivo>
 -- ----------------------------------------------------------------------------
 insert into storage.buckets (id, name, public)
 values ('documentos', 'documentos', false)
@@ -500,7 +496,7 @@ create policy "storage_docs_advogada_all" on storage.objects
   using (bucket_id = 'documentos' and public.is_advogada())
   with check (bucket_id = 'documentos' and public.is_advogada());
 
--- Cliente: lÃª/escreve apenas objetos no prefixo de um cliente vinculado a ele
+-- Cliente: lê/escreve apenas objetos no prefixo de um cliente vinculado a ele
 drop policy if exists "storage_docs_cliente_select" on storage.objects;
 create policy "storage_docs_cliente_select" on storage.objects
   for select
@@ -518,16 +514,16 @@ create policy "storage_docs_cliente_insert" on storage.objects
   );
 
 -- ----------------------------------------------------------------------------
--- Realtime â€” habilita o chat ao vivo na tabela de mensagens
+-- Realtime — habilita o chat ao vivo na tabela de mensagens
 -- ----------------------------------------------------------------------------
 do $$ begin
   alter publication supabase_realtime add table public.mensagens;
 exception when duplicate_object then null; end $$;
 
 -- ----------------------------------------------------------------------------
--- LGPD â€” Direito ao esquecimento
--- Exclui o usuÃ¡rio autenticado e todos os seus dados (cascade via FKs).
--- Chamada via RPC pelo prÃ³prio cliente no portal.
+-- LGPD — Direito ao esquecimento
+-- Exclui o usuário autenticado e todos os seus dados (cascade via FKs).
+-- Chamada via RPC pelo próprio cliente no portal.
 -- ----------------------------------------------------------------------------
 create or replace function public.excluir_minha_conta()
 returns void
@@ -539,14 +535,14 @@ declare
   uid uuid := auth.uid();
 begin
   if uid is null then
-    raise exception 'NÃ£o autenticado';
+    raise exception 'Não autenticado';
   end if;
 
-  -- Desvincula registros de cliente (mantÃ©m histÃ³rico processual do escritÃ³rio,
-  -- mas remove o vÃ­nculo de acesso e anonimiza o profile).
+  -- Desvincula registros de cliente (mantém histórico processual do escritório,
+  -- mas remove o vínculo de acesso e anonimiza o profile).
   update public.clientes set profile_id = null where profile_id = uid;
 
-  -- Remove o usuÃ¡rio do Auth (cascata remove o profile).
+  -- Remove o usuário do Auth (cascata remove o profile).
   delete from auth.users where id = uid;
 end;
 $$;
@@ -556,7 +552,7 @@ grant execute on function public.excluir_minha_conta() to authenticated;
 
 -- ----------------------------------------------------------------------------
 -- Views/RPC de leitura com descriptografia controlada (apenas advogada via RLS)
--- Retorna cliente com CPF/CTPS jÃ¡ descriptografados â€” sÃ³ roda se o caller
+-- Retorna cliente com CPF/CTPS já descriptografados — só roda se o caller
 -- passar pela RLS de clientes (advogada ou dono).
 -- ----------------------------------------------------------------------------
 create or replace function public.cliente_detalhe(p_cliente_id uuid)
@@ -599,10 +595,9 @@ $$;
 
 
 -- >>> 0004_rpc_clientes.sql >>>
-
 -- ============================================================================
--- RPC para salvar cliente com criptografia de dados sensÃ­veis (CPF, CTPS).
--- A cifragem ocorre no banco (pgcrypto) â€” o plaintext nunca Ã© persistido.
+-- RPC para salvar cliente com criptografia de dados sensíveis (CPF, CTPS).
+-- A cifragem ocorre no banco (pgcrypto) — o plaintext nunca é persistido.
 -- security invoker => respeita a RLS de `clientes` (apenas advogada escreve).
 -- ============================================================================
 create or replace function public.salvar_cliente(
@@ -671,23 +666,21 @@ grant execute on function public.salvar_cliente(
 
 
 -- >>> 0005_contatos_telefone.sql >>>
-
 -- ============================================================================
--- Adiciona o campo de telefone ao formulÃ¡rio de contato pÃºblico.
+-- Adiciona o campo de telefone ao formulário de contato público.
 -- ============================================================================
 alter table public.contatos
   add column if not exists telefone text;
 
 
 -- >>> 0006_config_depoimentos.sql >>>
-
 -- ============================================================================
--- ConteÃºdo editÃ¡vel pela advogada (admin): configuraÃ§Ãµes do escritÃ³rio e
--- depoimentos de clientes. O site pÃºblico lÃª dessas tabelas.
+-- Conteúdo editável pela advogada (admin): configurações do escritório e
+-- depoimentos de clientes. O site público lê dessas tabelas.
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- configuracoes â€” linha Ãºnica (id = 1) com dados de contato/identificaÃ§Ã£o
+-- configuracoes — linha única (id = 1) com dados de contato/identificação
 -- ----------------------------------------------------------------------------
 create table if not exists public.configuracoes (
   id              int primary key default 1 check (id = 1),
@@ -714,17 +707,17 @@ insert into public.configuracoes
   (id, escritorio_nome, advogada_nome, oab, email, telefone, endereco)
 values (
   1,
-  'Isadora GonÃ§alves Advocacia e Consultoria JurÃ­dica',
-  'Isadora GonÃ§alves',
+  'Isadora Gonçalves Advocacia e Consultoria Jurídica',
+  'Isadora Gonçalves',
   'OAB/DF 76.416',
   'contato@isadoragoncalves.adv.br',
   '(61) 9 8441-1723',
-  'QND 26, Lote 15, Taguatinga Norte, BrasÃ­lia/DF'
+  'Brasília/DF'
 )
 on conflict (id) do nothing;
 
 -- ----------------------------------------------------------------------------
--- depoimentos â€” relatos de clientes (sem identificaÃ§Ã£o completa, LGPD)
+-- depoimentos — relatos de clientes (sem identificação completa, LGPD)
 -- ----------------------------------------------------------------------------
 create table if not exists public.depoimentos (
   id          uuid primary key default uuid_generate_v4(),
@@ -748,17 +741,16 @@ create policy "depoimentos_advogada_write" on public.depoimentos
 
 insert into public.depoimentos (autor, contexto, texto, ordem)
 select * from (values
-  ('M. S.', 'ReclamaÃ§Ã£o trabalhista', 'Fui orientada com clareza em cada etapa do processo. O acompanhamento pelo portal me deu tranquilidade.', 1),
-  ('J. P.', 'RescisÃ£o indireta', 'Atendimento tÃ©cnico e humano. Entendi todos os meus direitos sem promessas vazias.', 2),
-  ('A. R.', 'Verbas rescisÃ³rias', 'Profissionalismo do inÃ­cio ao fim. Recomendo pela transparÃªncia nas informaÃ§Ãµes.', 3)
+  ('M. S.', 'Reclamação trabalhista', 'Fui orientada com clareza em cada etapa do processo. O acompanhamento pelo portal me deu tranquilidade.', 1),
+  ('J. P.', 'Rescisão indireta', 'Atendimento técnico e humano. Entendi todos os meus direitos sem promessas vazias.', 2),
+  ('A. R.', 'Verbas rescisórias', 'Profissionalismo do início ao fim. Recomendo pela transparência nas informações.', 3)
 ) as v(autor, contexto, texto, ordem)
 where not exists (select 1 from public.depoimentos);
 
 
 -- >>> 0007_gestao_processo.sql >>>
-
 -- ============================================================================
--- GestÃ£o do processo (acesso EXCLUSIVO da advogada) e remoÃ§Ã£o das movimentaÃ§Ãµes.
+-- Gestão do processo (acesso EXCLUSIVO da advogada) e remoção das movimentações.
 -- ============================================================================
 
 -- Desfecho do processo
@@ -768,17 +760,17 @@ do $$ begin
   );
 exception when duplicate_object then null; end $$;
 
--- Tabela 1:1 com processos â€” dados internos de gestÃ£o.
--- Fica em tabela separada (e nÃ£o em `processos`) para que a RLS garanta que
--- o CLIENTE nunca acesse esses dados, nem via API (RLS Ã© por linha; colunas
--- sensÃ­veis ficam isoladas aqui, sem policy de cliente).
+-- Tabela 1:1 com processos — dados internos de gestão.
+-- Fica em tabela separada (e não em `processos`) para que a RLS garanta que
+-- o CLIENTE nunca acesse esses dados, nem via API (RLS é por linha; colunas
+-- sensíveis ficam isoladas aqui, sem policy de cliente).
 create table if not exists public.processo_gestao (
   processo_id          uuid primary key references public.processos(id) on delete cascade,
-  valor_pedido         numeric(14,2),   -- valor pleiteado/exposto na aÃ§Ã£o
+  valor_pedido         numeric(14,2),   -- valor pleiteado/exposto na ação
   valor_sentenca       numeric(14,2),   -- valor efetivamente decidido
   resultado            resultado_processo not null default 'EM_ANDAMENTO',
   data_encerramento    date,
-  honorario_exito_pct  numeric(5,2),    -- % de honorÃ¡rio de Ãªxito sobre a sentenÃ§a
+  honorario_exito_pct  numeric(5,2),    -- % de honorário de êxito sobre a sentença
   licoes_aprendidas    text,
   created_at           timestamptz not null default now(),
   updated_at           timestamptz not null default now()
@@ -790,16 +782,15 @@ drop policy if exists "gestao_advogada_all" on public.processo_gestao;
 create policy "gestao_advogada_all" on public.processo_gestao
   for all using (public.is_advogada()) with check (public.is_advogada());
 
--- Remove o mÃ³dulo de movimentaÃ§Ãµes por completo
+-- Remove o módulo de movimentações por completo
 drop table if exists public.movimentacoes cascade;
 
 
 -- >>> 0008_somente_advogada_upload.sql >>>
-
 -- ============================================================================
 -- Apenas a advogada pode enviar documentos. O cliente continua podendo
--- VISUALIZAR/baixar (polÃ­ticas de select permanecem), mas nÃ£o inserir.
--- Removemos as polÃ­ticas de INSERT do cliente (tabela e storage).
+-- VISUALIZAR/baixar (políticas de select permanecem), mas não inserir.
+-- Removemos as políticas de INSERT do cliente (tabela e storage).
 -- ============================================================================
 
 drop policy if exists "docs_cliente_insert" on public.documentos;

@@ -12,7 +12,7 @@ export const ESCRITORIO = {
   nomeCurto: "Isadora Gonçalves Advocacia",
   advogada: "Isadora Gonçalves",
   oab: "OAB/DF 76.416",
-  endereco: "QND 26, Lote 15, Taguatinga Norte, Brasília/DF",
+  endereco: "Brasília/DF",
   email: "contato@isadoragoncalves.adv.br",
   telefone: "(61) 9 8441-1723",
   cidade: "Brasília/DF",
