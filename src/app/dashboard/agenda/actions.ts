@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireProfile } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 
 function nn(fd: FormData, k: string): string | null {
   const v = fd.get(k);
@@ -10,7 +10,7 @@ function nn(fd: FormData, k: string): string | null {
 }
 
 export async function salvarEvento(formData: FormData) {
-  const { supabase, profile } = await requireProfile("advogada");
+  const { supabase, profile } = await requireStaff();
   const id = formData.get("id") ? String(formData.get("id")) : null;
 
   const payload = {
@@ -33,7 +33,7 @@ export async function salvarEvento(formData: FormData) {
 }
 
 export async function excluirEvento(formData: FormData) {
-  const { supabase } = await requireProfile("advogada");
+  const { supabase } = await requireStaff();
   await supabase.from("agenda").delete().eq("id", String(formData.get("id")));
   revalidatePath("/dashboard/agenda");
 }

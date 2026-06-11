@@ -1,5 +1,5 @@
 import { Calendar, MapPin, Trash2, AlertTriangle, Gavel } from "lucide-react";
-import { requireProfile } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { PageHeader, EmptyState } from "@/components/app/ui-bits";
 import { TipoAgendaBadge } from "@/components/app/status-badge";
 import { EventoForm } from "./evento-form";
@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardAgenda() {
-  const { supabase } = await requireProfile("advogada");
+  const { supabase } = await requireStaff();
 
   const [{ data: agendaData }, { data: procData }] = await Promise.all([
     supabase

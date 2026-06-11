@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Briefcase, FileDown, ChevronRight } from "lucide-react";
-import { requireProfile } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { PageHeader, EmptyState } from "@/components/app/ui-bits";
 import { StatusProcessoBadge } from "@/components/app/status-badge";
 import { ProcessoForm } from "./processo-form";
@@ -28,7 +28,8 @@ export default async function DashboardProcessos({
 }: {
   searchParams: { status?: string; tipo?: string; cliente?: string };
 }) {
-  const { supabase } = await requireProfile("advogada");
+  const { supabase, profile } = await requireStaff();
+  const isAdmin = profile.role === "advogada";
 
   let query = supabase
     .from("processos")
@@ -43,31 +44,51 @@ export default async function DashboardProcessos({
   const { data } = await query.returns<ProcessoComCliente[]>();
   const processos = data ?? [];
 
-  const { data: clientesData } = await supabase
-    .from("clientes")
-    .select("id, nome")
-    .order("nome")
-    .returns<Pick<Cliente, "id" | "nome">[]>();
-  const clientes = clientesData ?? [];
+  // Clientes e equipe só fazem sentido para o admin (cadastro/atribuição).
+  const clientes = isAdmin
+    ? (
+        await supabase
+          .from("clientes")
+          .select("id, nome")
+          .order("nome")
+          .returns<Pick<Cliente, "id" | "nome">[]>()
+      ).data ?? []
+    : [];
+  const staff = isAdmin
+    ? (
+        await supabase
+          .from("profiles")
+          .select("id, nome")
+          .in("role", ["advogada", "associado"])
+          .order("nome")
+          .returns<{ id: string; nome: string }[]>()
+      ).data ?? []
+    : [];
 
   return (
     <>
       <PageHeader
-        titulo="Gestão de processos"
-        descricao="Cadastro e acompanhamento dos processos trabalhistas."
+        titulo={isAdmin ? "Gestão de processos" : "Meus processos"}
+        descricao={
+          isAdmin
+            ? "Cadastro e acompanhamento dos processos trabalhistas."
+            : "Processos direcionados a você."
+        }
         acao={
-          <div className="flex gap-2">
-            <Button asChild variant="outline">
-              <Link href="/relatorio/processos" target="_blank">
-                <FileDown className="h-4 w-4" /> Exportar PDF
-              </Link>
-            </Button>
-            <ProcessoForm clientes={clientes} />
-          </div>
+          isAdmin ? (
+            <div className="flex gap-2">
+              <Button asChild variant="outline">
+                <Link href="/relatorio/processos" target="_blank">
+                  <FileDown className="h-4 w-4" /> Exportar PDF
+                </Link>
+              </Button>
+              <ProcessoForm clientes={clientes} staff={staff} isAdmin />
+            </div>
+          ) : undefined
         }
       />
 
-      <ProcessoFiltros clientes={clientes} />
+      {isAdmin && <ProcessoFiltros clientes={clientes} />}
 
       {processos.length === 0 ? (
         <EmptyState

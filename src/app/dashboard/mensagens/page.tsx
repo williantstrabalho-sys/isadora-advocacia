@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MessageSquare, ChevronRight } from "lucide-react";
-import { requireProfile } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { PageHeader, EmptyState } from "@/components/app/ui-bits";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import type { Cliente, Mensagem } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardMensagens() {
-  const { supabase, profile } = await requireProfile("advogada");
+  const { supabase, profile } = await requireStaff();
 
   const [{ data: cliData }, { data: msgData }] = await Promise.all([
     supabase

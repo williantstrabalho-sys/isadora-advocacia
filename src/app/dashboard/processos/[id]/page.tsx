@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Trash2, Lock } from "lucide-react";
-import { requireProfile } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { PageHeader, Field } from "@/components/app/ui-bits";
 import { StatusProcessoBadge } from "@/components/app/status-badge";
 import { ProcessoForm } from "../processo-form";
@@ -42,7 +42,8 @@ export default async function DashboardProcessoDetalhe({
 }: {
   params: { id: string };
 }) {
-  const { supabase } = await requireProfile("advogada");
+  const { supabase, profile } = await requireStaff();
+  const isAdmin = profile.role === "advogada";
 
   const { data: processo } = await supabase
     .from("processos")
@@ -52,20 +53,33 @@ export default async function DashboardProcessoDetalhe({
 
   if (!processo) notFound();
 
-  const [{ data: gestaoData }, { data: clientesData }] = await Promise.all([
-    supabase
-      .from("processo_gestao")
-      .select("*")
-      .eq("processo_id", processo.id)
-      .single<ProcessoGestao>(),
-    supabase
-      .from("clientes")
-      .select("id, nome")
-      .order("nome")
-      .returns<Pick<Cliente, "id" | "nome">[]>(),
-  ]);
+  const { data: gestaoData } = await supabase
+    .from("processo_gestao")
+    .select("*")
+    .eq("processo_id", processo.id)
+    .single<ProcessoGestao>();
   const g = gestaoData;
-  const clientes = clientesData ?? [];
+
+  // Listas de cliente/equipe só para o admin (atribuição).
+  const clientes = isAdmin
+    ? (
+        await supabase
+          .from("clientes")
+          .select("id, nome")
+          .order("nome")
+          .returns<Pick<Cliente, "id" | "nome">[]>()
+      ).data ?? []
+    : [];
+  const staff = isAdmin
+    ? (
+        await supabase
+          .from("profiles")
+          .select("id, nome")
+          .in("role", ["advogada", "associado"])
+          .order("nome")
+          .returns<{ id: string; nome: string }[]>()
+      ).data ?? []
+    : [];
 
   // Relação pedido x sentença
   const aproveitamento =
@@ -111,13 +125,20 @@ export default async function DashboardProcessoDetalhe({
         acao={
           <div className="flex items-center gap-2">
             <StatusProcessoBadge status={processo.status} />
-            <ProcessoForm clientes={clientes} processo={processo} />
-            <form action={excluirProcesso}>
-              <input type="hidden" name="id" value={processo.id} />
-              <Button type="submit" variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </form>
+            <ProcessoForm
+              clientes={clientes}
+              processo={processo}
+              staff={staff}
+              isAdmin={isAdmin}
+            />
+            {isAdmin && (
+              <form action={excluirProcesso}>
+                <input type="hidden" name="id" value={processo.id} />
+                <Button type="submit" variant="destructive" size="sm">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </form>
+            )}
           </div>
         }
       />

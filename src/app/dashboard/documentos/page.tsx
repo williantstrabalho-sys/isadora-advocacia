@@ -1,5 +1,5 @@
 import { FolderOpen, Download } from "lucide-react";
-import { requireProfile } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { PageHeader, EmptyState } from "@/components/app/ui-bits";
 import { DashboardDocUpload } from "./doc-upload";
 import { Card } from "@/components/ui/card";
@@ -22,7 +22,7 @@ type DocRow = Documento & {
 };
 
 export default async function DashboardDocumentos() {
-  const { supabase } = await requireProfile("advogada");
+  const { supabase } = await requireStaff();
 
   const [{ data: docsData }, { data: cliData }, { data: procData }] =
     await Promise.all([

@@ -56,17 +56,39 @@ export async function updateSession(request: NextRequest) {
       .single();
 
     const role = profile?.role;
+    const isStaff = role === "advogada" || role === "associado";
 
-    // Advogada não acessa portal do cliente; cliente não acessa dashboard
-    if (isDashboard && role !== "advogada") {
+    // Cliente não acessa dashboard; staff (advogada/associado) sim.
+    if (isDashboard && !isStaff) {
       const url = request.nextUrl.clone();
       url.pathname = "/portal";
       return NextResponse.redirect(url);
     }
+    // Só cliente acessa o portal.
     if (isPortal && role !== "cliente") {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
+    }
+
+    // Associado: acesso limitado dentro do dashboard.
+    if (isDashboard && role === "associado") {
+      const permitido = [
+        "/dashboard/processos",
+        "/dashboard/agenda",
+        "/dashboard/documentos",
+        "/dashboard/mensagens",
+      ];
+      const liberado = permitido.some(
+        (p) => path === p || path.startsWith(p + "/")
+      );
+      if (!liberado) {
+        // qualquer outra rota do dashboard (incl. a visão geral e áreas de
+        // admin) leva o associado para a sua lista de processos.
+        const url = request.nextUrl.clone();
+        url.pathname = "/dashboard/processos";
+        return NextResponse.redirect(url);
+      }
     }
   }
 

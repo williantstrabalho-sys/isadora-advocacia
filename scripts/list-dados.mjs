@@ -1,0 +1,10 @@
+import { Client } from "pg";
+const c = new Client({ ssl: { rejectUnauthorized: false } });
+await c.connect();
+const cli = await c.query("select nome, email, created_at from public.clientes order by created_at");
+const pr = await c.query("select numero_cnj, created_at from public.processos order by created_at");
+console.log("CLIENTES:");
+cli.rows.forEach((r) => console.log("  -", r.nome, "|", r.email, "|", r.created_at.toISOString().slice(0,10)));
+console.log("PROCESSOS:");
+pr.rows.forEach((r) => console.log("  -", r.numero_cnj, "|", r.created_at.toISOString().slice(0,10)));
+await c.end();

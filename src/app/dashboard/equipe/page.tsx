@@ -25,10 +25,10 @@ export default async function DashboardEquipe() {
 
   const { data } = await supabase
     .from("profiles")
-    .select("id, nome, email, created_at")
-    .eq("role", "advogada")
+    .select("id, nome, email, role, created_at")
+    .in("role", ["advogada", "associado"])
     .order("created_at", { ascending: true })
-    .returns<Pick<Profile, "id" | "nome" | "email" | "created_at">[]>();
+    .returns<Pick<Profile, "id" | "nome" | "email" | "role" | "created_at">[]>();
   const usuarios = data ?? [];
 
   const adminDisponivel = hasAdminKey();
@@ -37,7 +37,7 @@ export default async function DashboardEquipe() {
     <>
       <PageHeader
         titulo="Equipe"
-        descricao="Usuários com acesso de administrador (mesmas permissões da advogada)."
+        descricao="Administradores (acesso total) e advogados associados (acesso aos processos atribuídos a eles)."
         acao={adminDisponivel ? <UsuarioForm /> : undefined}
       />
 
@@ -70,6 +70,7 @@ export default async function DashboardEquipe() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
+                <TableHead>Papel</TableHead>
                 <TableHead>E-mail de login</TableHead>
                 <TableHead>Desde</TableHead>
                 <TableHead></TableHead>
@@ -78,6 +79,7 @@ export default async function DashboardEquipe() {
             <TableBody>
               {usuarios.map((u) => {
                 const souEu = u.id === profile.id;
+                const isAdmin = u.role === "advogada";
                 return (
                   <TableRow key={u.id}>
                     <TableCell className="font-medium">
@@ -89,6 +91,17 @@ export default async function DashboardEquipe() {
                           </Badge>
                         )}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={
+                          isAdmin
+                            ? "border-brand-accent/30 bg-brand-accent/10 text-brand-accent"
+                            : "border-sky-500/30 bg-sky-500/15 text-sky-400"
+                        }
+                      >
+                        {isAdmin ? "Administrador" : "Associado"}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-brand-muted">{u.email}</TableCell>
                     <TableCell className="text-brand-muted">
@@ -102,6 +115,7 @@ export default async function DashboardEquipe() {
                               id: u.id,
                               nome: u.nome,
                               email: u.email,
+                              role: u.role as "advogada" | "associado",
                             }}
                           />
                           {!souEu && (

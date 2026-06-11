@@ -1,8 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
-import { requireProfile } from "@/lib/auth";
+import { requireProfile, requireStaff } from "@/lib/auth";
 
 function parseList(raw: FormDataEntryValue | null): string[] {
   if (!raw) return [];
@@ -18,13 +17,12 @@ function nullableDate(raw: FormDataEntryValue | null): string | null {
 }
 
 export async function salvarProcesso(formData: FormData) {
-  const { supabase, profile } = await requireProfile("advogada");
-
+  const { supabase, profile } = await requireStaff();
+  const isAdmin = profile.role === "advogada";
   const id = formData.get("id") ? String(formData.get("id")) : null;
 
-  const payload = {
-    advogada_id: profile.id,
-    cliente_id: String(formData.get("cliente_id")),
+  // Campos editáveis tanto pela advogada quanto pelo associado responsável.
+  const dados = {
     numero_cnj: String(formData.get("numero_cnj") || "").trim(),
     tipo_acao: String(formData.get("tipo_acao")),
     vara: String(formData.get("vara") || "").trim() || null,
@@ -39,13 +37,37 @@ export async function salvarProcesso(formData: FormData) {
     obs: String(formData.get("obs") || "").trim() || null,
   };
 
-  if (id) {
-    await supabase.from("processos").update(payload).eq("id", id);
+  const respRaw = String(formData.get("responsavel_id") || "");
+  const responsavelId =
+    respRaw && respRaw !== "__admin__" ? respRaw : null;
+
+  if (!id) {
+    // Criação: apenas admin (associado não cria, recebe atribuição).
+    if (!isAdmin) return;
+    await supabase.from("processos").insert({
+      ...dados,
+      advogada_id: profile.id,
+      cliente_id: String(formData.get("cliente_id")),
+      responsavel_id: responsavelId,
+    });
+  } else if (isAdmin) {
+    // Admin edita tudo, incl. cliente e responsável (atribuição).
+    await supabase
+      .from("processos")
+      .update({
+        ...dados,
+        cliente_id: String(formData.get("cliente_id")),
+        responsavel_id: responsavelId,
+      })
+      .eq("id", id);
   } else {
-    await supabase.from("processos").insert(payload);
+    // Associado edita só os dados do processo dele (RLS garante o escopo);
+    // não altera cliente nem responsável.
+    await supabase.from("processos").update(dados).eq("id", id);
   }
 
   revalidatePath("/dashboard/processos");
+  revalidatePath(`/dashboard/processos/${id ?? ""}`);
 }
 
 export async function excluirProcesso(formData: FormData) {
@@ -56,7 +78,7 @@ export async function excluirProcesso(formData: FormData) {
 }
 
 export async function salvarGestao(formData: FormData) {
-  const { supabase } = await requireProfile("advogada");
+  const { supabase } = await requireStaff();
   const processoId = String(formData.get("processo_id"));
 
   const numero = (k: string): number | null => {

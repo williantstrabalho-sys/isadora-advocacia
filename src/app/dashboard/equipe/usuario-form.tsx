@@ -15,7 +15,12 @@ import {
 } from "@/components/ui/dialog";
 import { criarUsuario, atualizarUsuario } from "./actions";
 
-type Usuario = { id: string; nome: string; email: string };
+type Usuario = {
+  id: string;
+  nome: string;
+  email: string;
+  role?: "advogada" | "associado";
+};
 
 export function UsuarioForm({ usuario }: { usuario?: Usuario }) {
   const router = useRouter();
@@ -55,7 +60,7 @@ export function UsuarioForm({ usuario }: { usuario?: Usuario }) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {editando ? "Editar usuário" : "Novo usuário (administrador)"}
+            {editando ? "Editar usuário" : "Novo usuário"}
           </DialogTitle>
         </DialogHeader>
 
@@ -76,6 +81,23 @@ export function UsuarioForm({ usuario }: { usuario?: Usuario }) {
               required
               defaultValue={usuario?.email}
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="papel">Papel *</Label>
+            <select
+              id="papel"
+              name="papel"
+              defaultValue={usuario?.role ?? "associado"}
+              className="flex h-10 w-full rounded-md border border-brand-border bg-brand-bg px-3 text-sm text-brand-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-accent"
+            >
+              <option value="associado">
+                Advogado(a) associado(a) — só processos atribuídos
+              </option>
+              <option value="advogada">
+                Administrador(a) — acesso total
+              </option>
+            </select>
           </div>
 
           <div className="space-y-1.5">

@@ -25,13 +25,19 @@ import { salvarProcesso } from "./actions";
 import type { Processo, StatusProcesso } from "@/lib/types";
 
 type ClienteOpt = { id: string; nome: string };
+type StaffOpt = { id: string; nome: string };
 
 export function ProcessoForm({
   clientes,
   processo,
+  staff = [],
+  isAdmin = true,
 }: {
   clientes: ClienteOpt[];
   processo?: Processo;
+  /** advogada + associados, para atribuir o responsável (somente admin) */
+  staff?: StaffOpt[];
+  isAdmin?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const editando = Boolean(processo);
@@ -66,25 +72,51 @@ export function ProcessoForm({
           {processo && <input type="hidden" name="id" value={processo.id} />}
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="cliente_id">Cliente *</Label>
-              <Select
-                name="cliente_id"
-                defaultValue={processo?.cliente_id}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o cliente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clientes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {isAdmin && (
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="cliente_id">Cliente *</Label>
+                  <Select
+                    name="cliente_id"
+                    defaultValue={processo?.cliente_id}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o cliente" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {clientes.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="responsavel_id">Responsável</Label>
+                  <Select
+                    name="responsavel_id"
+                    defaultValue={processo?.responsavel_id ?? "__admin__"}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sob o admin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__admin__">
+                        Sob o admin (sem associado)
+                      </SelectItem>
+                      {staff.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
 
             <div className="space-y-1.5">
               <Label htmlFor="numero_cnj">Número CNJ *</Label>

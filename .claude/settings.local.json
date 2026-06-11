@@ -45,7 +45,9 @@
       "Bash(echo \"exit=$?\")",
       "Bash(awk '{print \"tamanho:\", $5, \"bytes\"}')",
       "Bash(awk '{print \"og:\", $5, \"bytes\"}')",
-      "Bash(curl -s -m 30 -o og-preview.png \"http://localhost:3000/opengraph-image\")"
+      "Bash(curl -s -m 30 -o og-preview.png \"http://localhost:3000/opengraph-image\")",
+      "Bash(sed -i 's#import { requireProfile } from \"@/lib/auth\";#import { requireStaff } from \"@/lib/auth\";#; s/await requireProfile\\(\"advogada\"\\)/await requireStaff\\(\\)/g' src/app/dashboard/agenda/actions.ts)",
+      "Bash(sed -i 's#import { requireProfile } from \"@/lib/auth\";#import { requireStaff } from \"@/lib/auth\";#; s/await requireProfile\\(\"advogada\"\\)/await requireStaff\\(\\)/g' src/app/dashboard/agenda/page.tsx)"
     ]
   }
 }

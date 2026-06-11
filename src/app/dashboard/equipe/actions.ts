@@ -16,6 +16,8 @@ export async function criarUsuario(formData: FormData): Promise<Resultado> {
   const nome = String(formData.get("nome") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const senha = String(formData.get("senha") || "");
+  const role =
+    String(formData.get("papel")) === "associado" ? "associado" : "advogada";
 
   if (!nome || !email || senha.length < 6) {
     return { error: "Preencha nome, e-mail e senha (mín. 6 caracteres)." };
@@ -26,7 +28,7 @@ export async function criarUsuario(formData: FormData): Promise<Resultado> {
     email,
     password: senha,
     email_confirm: true,
-    user_metadata: { role: "advogada", nome },
+    user_metadata: { role, nome },
   });
 
   if (error) {
@@ -37,11 +39,11 @@ export async function criarUsuario(formData: FormData): Promise<Resultado> {
     };
   }
 
-  // Garante o profile com papel de administrador (o trigger já cria, reforçamos)
+  // Garante o profile com o papel escolhido (o trigger já cria, reforçamos)
   if (data.user) {
     await admin.from("profiles").upsert({
       id: data.user.id,
-      role: "advogada",
+      role,
       nome,
       email,
     });
@@ -59,6 +61,8 @@ export async function atualizarUsuario(formData: FormData): Promise<Resultado> {
   const nome = String(formData.get("nome") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const senha = String(formData.get("senha") || "");
+  const role =
+    String(formData.get("papel")) === "associado" ? "associado" : "advogada";
 
   if (!id || !nome || !email) {
     return { error: "Nome e e-mail são obrigatórios." };
@@ -73,7 +77,7 @@ export async function atualizarUsuario(formData: FormData): Promise<Resultado> {
   } = {
     email,
     email_confirm: true,
-    user_metadata: { role: "advogada", nome },
+    user_metadata: { role, nome },
   };
   if (senha) {
     if (senha.length < 6)
@@ -84,7 +88,7 @@ export async function atualizarUsuario(formData: FormData): Promise<Resultado> {
   const { error } = await admin.auth.admin.updateUserById(id, attrs);
   if (error) return { error: error.message };
 
-  await admin.from("profiles").update({ nome, email }).eq("id", id);
+  await admin.from("profiles").update({ nome, email, role }).eq("id", id);
 
   revalidatePath("/dashboard/equipe");
   return { ok: true };

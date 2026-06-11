@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { requireProfile } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { PageHeader } from "@/components/app/ui-bits";
 import { Chat } from "@/components/app/chat";
 import type { Cliente } from "@/lib/types";
@@ -13,7 +13,7 @@ export default async function ConversaCliente({
 }: {
   params: { clienteId: string };
 }) {
-  const { supabase, profile } = await requireProfile("advogada");
+  const { supabase, profile } = await requireStaff();
 
   const { data: cliente } = await supabase
     .from("clientes")

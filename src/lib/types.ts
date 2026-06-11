@@ -6,7 +6,7 @@
 // Supabase exige que cada Row satisfaça `Record<string, unknown>`, o que
 // aliases de tipo atendem mas interfaces não (quirk do TypeScript).
 
-export type UserRole = "cliente" | "advogada";
+export type UserRole = "cliente" | "advogada" | "associado";
 
 export type TipoAcaoTrabalhista =
   | "RECLAMACAO_TRABALHISTA"
@@ -70,6 +70,7 @@ export type Processo = {
   id: string;
   cliente_id: string;
   advogada_id: string;
+  responsavel_id: string | null;
   numero_cnj: string;
   tipo_acao: TipoAcaoTrabalhista;
   vara: string | null;
