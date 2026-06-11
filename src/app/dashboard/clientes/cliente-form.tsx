@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +18,10 @@ import { salvarCliente } from "./actions";
 import type { ClienteDetalhe } from "@/lib/types";
 
 export function ClienteForm({ cliente }: { cliente?: ClienteDetalhe }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  const [salvando, setSalvando] = useState(false);
   const editando = Boolean(cliente);
 
   return (
@@ -41,9 +45,19 @@ export function ClienteForm({ cliente }: { cliente?: ClienteDetalhe }) {
         </DialogHeader>
 
         <form
-          action={async (fd) => {
-            await salvarCliente(fd);
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setErro(null);
+            setSalvando(true);
+            const fd = new FormData(e.currentTarget);
+            const r = await salvarCliente(fd);
+            setSalvando(false);
+            if (r?.error) {
+              setErro(r.error);
+              return;
+            }
             setOpen(false);
+            router.refresh();
           }}
           className="space-y-4"
         >
@@ -158,11 +172,19 @@ export function ClienteForm({ cliente }: { cliente?: ClienteDetalhe }) {
             </div>
           </div>
 
+          {erro && (
+            <p className="flex items-start gap-2 text-sm text-red-400">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {erro}
+            </p>
+          )}
+
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
-            <Button type="submit">Salvar</Button>
+            <Button type="submit" disabled={salvando}>
+              {salvando ? "Salvando..." : "Salvar"}
+            </Button>
           </div>
         </form>
       </DialogContent>

@@ -9,13 +9,15 @@ function str(fd: FormData, k: string): string | null {
   return s || null;
 }
 
-export async function salvarCliente(formData: FormData) {
+export async function salvarCliente(
+  formData: FormData
+): Promise<{ ok?: true; error?: string }> {
   const { supabase } = await requireProfile("advogada");
 
   const id = formData.get("id") ? String(formData.get("id")) : null;
   const cpfDigits = (str(formData, "cpf") ?? "").replace(/\D/g, "") || null;
 
-  await supabase.rpc("salvar_cliente", {
+  const { error } = await supabase.rpc("salvar_cliente", {
     p_id: id,
     p_nome: str(formData, "nome"),
     p_cpf: cpfDigits,
@@ -32,7 +34,15 @@ export async function salvarCliente(formData: FormData) {
     p_profile_id: str(formData, "profile_id"),
   });
 
+  if (error) {
+    return {
+      error:
+        "Não foi possível salvar o cliente. Detalhe técnico: " + error.message,
+    };
+  }
+
   revalidatePath("/dashboard/clientes");
+  return { ok: true };
 }
 
 export async function excluirCliente(formData: FormData) {
