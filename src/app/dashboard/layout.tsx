@@ -14,7 +14,6 @@ const NAV: NavItem[] = [
   { href: "/dashboard/licoes", label: "Lições aprendidas", icon: "BookOpen" },
   { href: "/dashboard/mensagens", label: "Mensagens", icon: "MessageSquare" },
   { href: "/dashboard/contatos", label: "Contatos recebidos", icon: "Inbox" },
-  { href: "/dashboard/conteudo", label: "Conteúdo do site", icon: "LayoutTemplate" },
   { href: "/dashboard/blog", label: "Blog", icon: "Newspaper" },
   { href: "/dashboard/depoimentos", label: "Depoimentos", icon: "Quote" },
   { href: "/dashboard/equipe", label: "Equipe", icon: "UserCog" },
