@@ -18,6 +18,10 @@ export const ESCRITORIO = {
   cidade: "Brasília/DF",
 } as const;
 
+// URL pública (SEO, og:image, sitemap, links de recuperação de senha).
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://isadora-advocacia.vercel.app";
+
 export const AVISO_OAB =
   "Este site não constitui captação de clientela. Publicidade regulamentada pelo Provimento 205/2021 do CFOAB.";
 

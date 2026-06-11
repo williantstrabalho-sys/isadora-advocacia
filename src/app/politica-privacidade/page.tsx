@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Política de Privacidade e tratamento de dados pessoais em conformidade com a LGPD (Lei 13.709/2018).",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function PoliticaPrivacidadePage() {
   const cfg = await getConfig();

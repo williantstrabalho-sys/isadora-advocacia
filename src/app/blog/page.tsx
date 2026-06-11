@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { SiteHeaderServer } from "@/components/public/site-header-server";
 import { SiteFooter } from "@/components/public/site-footer";
 import { Badge } from "@/components/ui/badge";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { formatData } from "@/lib/format";
 import type { BlogPost } from "@/lib/types";
 
@@ -14,11 +14,11 @@ export const metadata: Metadata = {
 };
 
 // Conteúdo dinâmico (depende do banco)
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 async function getPosts(): Promise<BlogPost[]> {
   try {
-    const supabase = createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("blog_posts")
       .select("*")

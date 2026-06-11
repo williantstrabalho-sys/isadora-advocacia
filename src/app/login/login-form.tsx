@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -87,6 +88,15 @@ export function LoginForm() {
       <Button type="submit" className="w-full" disabled={carregando}>
         {carregando ? "Entrando..." : "Entrar"}
       </Button>
+
+      <p className="text-center text-xs">
+        <Link
+          href="/esqueci-senha"
+          className="text-brand-muted hover:text-brand-accent"
+        >
+          Esqueci minha senha
+        </Link>
+      </p>
     </form>
   );
 }

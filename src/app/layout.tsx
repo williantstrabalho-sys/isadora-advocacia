@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ESCRITORIO } from "@/lib/constants";
+import { ESCRITORIO, SITE_URL } from "@/lib/constants";
 import { CookieConsent } from "@/components/public/cookie-consent";
 
 const inter = Inter({
@@ -11,9 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-  ),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: `${ESCRITORIO.nomeCurto} — Direito Trabalhista em Brasília/DF`,
     template: `%s | ${ESCRITORIO.nomeCurto}`,

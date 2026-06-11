@@ -27,11 +27,12 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getConfig, getDepoimentos, getConteudo } from "@/lib/settings";
+import { SITE_URL } from "@/lib/constants";
 
 // Ícones das especialidades — parte da estrutura fixa (não editável)
 const ICONES = [Scale, Clock, ShieldAlert, Wallet, HeartPulse, Users];
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function HomePage() {
   const cfg = await getConfig();
@@ -51,8 +52,37 @@ export default async function HomePage() {
       )}`
     : "";
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LegalService",
+    name: cfg.escritorio_nome,
+    description:
+      "Escritório especializado em Direito Trabalhista em Brasília/DF.",
+    url: SITE_URL,
+    telephone: cfg.telefone,
+    email: cfg.email,
+    areaServed: "Brasília/DF",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Brasília",
+      addressRegion: "DF",
+      addressCountry: "BR",
+      streetAddress: cfg.endereco,
+    },
+    founder: {
+      "@type": "Person",
+      name: cfg.advogada_nome,
+      jobTitle: "Advogada",
+    },
+    knowsAbout: c.especialidades.itens.map((e) => e.titulo),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <SiteHeaderServer />
       <main>
         {/* HERO */}

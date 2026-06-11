@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { ESCRITORIO, DEPOIMENTOS } from "@/lib/constants";
 import { CONTEUDO_PADRAO, type ConteudoSite } from "@/lib/cms-defaults";
 import type { Configuracao, Depoimento } from "@/lib/types";
@@ -30,7 +30,7 @@ const FALLBACK: SiteConfig = {
  */
 export async function getConfig(): Promise<SiteConfig> {
   try {
-    const supabase = createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("configuracoes")
       .select("*")
@@ -57,7 +57,7 @@ export async function getConfig(): Promise<SiteConfig> {
  */
 export async function getConteudo(): Promise<ConteudoSite> {
   try {
-    const supabase = createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("site_conteudo")
       .select("chave, valor")
@@ -85,7 +85,7 @@ export async function getDepoimentos(): Promise<
   Pick<Depoimento, "autor" | "contexto" | "texto">[]
 > {
   try {
-    const supabase = createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("depoimentos")
       .select("autor, contexto, texto, publicado, ordem")
