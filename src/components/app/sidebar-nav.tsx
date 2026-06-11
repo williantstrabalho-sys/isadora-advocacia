@@ -17,6 +17,7 @@ import {
   Quote,
   BookOpen,
   UserCog,
+  LayoutTemplate,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ const ICONS: Record<string, LucideIcon> = {
   Quote,
   BookOpen,
   UserCog,
+  LayoutTemplate,
 };
 
 export type IconName = keyof typeof ICONS;

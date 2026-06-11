@@ -10,13 +10,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function LoginPage() {
+export const dynamic = "force-dynamic";
+
+export default async function LoginPage() {
+  const { getConteudo } = await import("@/lib/settings");
+  const logoSrc = (await getConteudo()).imagens.logo;
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <Link href="/" className="flex justify-center">
           <span className="inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-elevated to-brand-surface px-8 py-6 shadow-[0_10px_40px_-10px_rgba(212,105,30,0.4)] ring-1 ring-brand-accent/30">
-            <Logo className="h-28 w-auto sm:h-32" />
+            <Logo src={logoSrc} className="h-28 w-auto sm:h-32" />
           </span>
         </Link>
 

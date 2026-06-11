@@ -15,7 +15,9 @@ type Props = {
 /**
  * Shell com sidebar fixa para áreas autenticadas (portal e dashboard).
  */
-export function AppShell({ items, contexto, user, children }: Props) {
+export async function AppShell({ items, contexto, user, children }: Props) {
+  const { getConteudo } = await import("@/lib/settings");
+  const logoSrc = (await getConteudo()).imagens.logo;
   return (
     <div className="flex min-h-screen bg-brand-bg">
       {/* Sidebar fixa (desktop) */}
@@ -23,7 +25,7 @@ export function AppShell({ items, contexto, user, children }: Props) {
         <div className="flex items-center justify-center border-b border-brand-border px-6 py-6">
           <Link href="/" aria-label="Início">
             <span className="flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-elevated to-brand-surface px-5 py-4 shadow-[0_10px_40px_-12px_rgba(212,105,30,0.45)] ring-1 ring-brand-accent/30">
-              <Logo className="h-20 w-auto" />
+              <Logo src={logoSrc} className="h-20 w-auto" />
             </span>
           </Link>
         </div>
@@ -52,7 +54,7 @@ export function AppShell({ items, contexto, user, children }: Props) {
         <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-brand-border bg-brand-bg/80 px-4 backdrop-blur lg:hidden">
           <Link href="/" aria-label="Início">
             <span className="flex items-center justify-center rounded-lg bg-gradient-to-b from-brand-elevated to-brand-surface px-2.5 py-1.5 ring-1 ring-brand-accent/30">
-              <Logo className="h-10 w-auto" />
+              <Logo src={logoSrc} className="h-10 w-auto" />
             </span>
           </Link>
           <span className="text-xs uppercase tracking-wider text-brand-muted">

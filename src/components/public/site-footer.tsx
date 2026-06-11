@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { AVISO_OAB } from "@/lib/constants";
-import { getConfig } from "@/lib/settings";
+import { getConfig, getConteudo } from "@/lib/settings";
 
 export async function SiteFooter() {
   const cfg = await getConfig();
+  const conteudo = await getConteudo();
   return (
     <footer className="border-t border-brand-border bg-brand-surface">
       <div className="container py-12">
         <div className="grid gap-8 md:grid-cols-3">
           <div>
-            <Logo className="h-20 w-auto" />
+            <Logo src={conteudo.imagens.logo} className="h-20 w-auto" />
             <p className="mt-4 max-w-xs text-sm text-brand-muted">
               Advocacia especializada em Direito Trabalhista, com atuação em
               {" "}

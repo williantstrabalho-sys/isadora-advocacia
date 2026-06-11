@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { SiteHeader } from "@/components/public/site-header";
+import { SiteHeaderServer } from "@/components/public/site-header-server";
 import { SiteFooter } from "@/components/public/site-footer";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
@@ -35,7 +35,7 @@ export default async function BlogPage() {
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeaderServer />
       <main className="container py-16">
         <header className="max-w-2xl">
           <h1 className="font-display text-4xl font-bold tracking-tight">

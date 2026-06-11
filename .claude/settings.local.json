@@ -30,7 +30,8 @@
       "Bash(curl -s -o /dev/null -w \"sobre img => %{http_code}\\\\n\" \"http://localhost:3000/isadora-sobre.jpg\")",
       "WebFetch(domain:isadora-advocacia.vercel.app)",
       "Bash(curl -s -o /dev/null \"http://localhost:3000/\")",
-      "Bash(curl -s -o /dev/null -w \"sobre png => %{http_code}\\\\n\" http://localhost:3000/isadora-sobre.png)"
+      "Bash(curl -s -o /dev/null -w \"sobre png => %{http_code}\\\\n\" http://localhost:3000/isadora-sobre.png)",
+      "Bash(curl -s -o /tmp/h.html -w \"%{http_code}\" http://localhost:3000/)"
     ]
   }
 }

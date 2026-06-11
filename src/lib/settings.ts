@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { ESCRITORIO, DEPOIMENTOS } from "@/lib/constants";
+import { CONTEUDO_PADRAO, type ConteudoSite } from "@/lib/cms-defaults";
 import type { Configuracao, Depoimento } from "@/lib/types";
 
 export type SiteConfig = {
@@ -47,6 +48,36 @@ export async function getConfig(): Promise<SiteConfig> {
     };
   } catch {
     return FALLBACK;
+  }
+}
+
+/**
+ * Conteúdo da landing (CMS). Mescla os blocos salvos no banco sobre o
+ * conteúdo padrão (fallback), por bloco. Nunca lança — sempre retorna algo.
+ */
+export async function getConteudo(): Promise<ConteudoSite> {
+  try {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("site_conteudo")
+      .select("chave, valor")
+      .returns<{ chave: string; valor: Record<string, unknown> }[]>();
+    if (!data || data.length === 0) return CONTEUDO_PADRAO;
+
+    const merged: ConteudoSite = structuredClone(CONTEUDO_PADRAO);
+    for (const row of data) {
+      const chave = row.chave as keyof ConteudoSite;
+      if (chave in merged && row.valor && typeof row.valor === "object") {
+        // mescla raso: o bloco salvo sobrescreve o padrão
+        (merged as Record<string, unknown>)[chave] = {
+          ...(merged[chave] as Record<string, unknown>),
+          ...(row.valor as Record<string, unknown>),
+        };
+      }
+    }
+    return merged;
+  } catch {
+    return CONTEUDO_PADRAO;
   }
 }
 

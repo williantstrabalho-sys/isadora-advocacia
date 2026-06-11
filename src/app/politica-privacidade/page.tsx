@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SiteHeader } from "@/components/public/site-header";
+import { SiteHeaderServer } from "@/components/public/site-header-server";
 import { SiteFooter } from "@/components/public/site-footer";
 import { getConfig } from "@/lib/settings";
 
@@ -15,7 +15,7 @@ export default async function PoliticaPrivacidadePage() {
   const cfg = await getConfig();
   return (
     <>
-      <SiteHeader />
+      <SiteHeaderServer />
       <main className="container py-16">
         <article className="prose-brand mx-auto max-w-3xl">
           <h1>Política de Privacidade</h1>

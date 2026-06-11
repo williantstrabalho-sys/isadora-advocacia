@@ -16,7 +16,7 @@ const NAV = [
   { href: "/#contato", label: "Contato" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ logoSrc }: { logoSrc?: string }) {
   const [aberto, setAberto] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -50,6 +50,7 @@ export function SiteHeader() {
             )}
           >
             <Logo
+              src={logoSrc}
               className={cn(
                 "w-auto transition-all duration-300",
                 scrolled ? "h-11 sm:h-16" : "h-16 sm:h-24"

@@ -1,27 +1,27 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { CONTEUDO_PADRAO } from "@/lib/cms-defaults";
 
 /**
- * Marca do escritório — usa exclusivamente o arquivo original public/logo.png
- * (monograma + tagline já embutidos na arte). O arquivo não é alterado:
- * apenas exibido e dimensionado. Sem texto adicional ao lado.
+ * Marca do escritório. A imagem (`src`) é configurável pelo admin (CMS); por
+ * padrão usa public/logo.png. Usamos <img> simples para aceitar tanto o arquivo
+ * local quanto uma URL do Storage (logo enviada pelo próprio usuário).
  *
  * Use `className` para ajustar o tamanho por contexto (ex.: "h-20 w-auto").
  */
 export function Logo({
   className,
+  src,
 }: {
   className?: string;
-  /** mantido por compatibilidade — não tem efeito (a arte já contém o texto) */
+  src?: string;
+  /** mantido por compatibilidade — não tem efeito */
   showText?: boolean;
 }) {
   return (
-    <Image
-      src="/logo.png"
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src || CONTEUDO_PADRAO.imagens.logo}
       alt="Isadora Gonçalves — Advocacia e Consultoria Jurídica"
-      width={1494}
-      height={946}
-      priority
       className={cn("h-14 w-auto object-contain", className)}
     />
   );

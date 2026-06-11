@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { SiteHeader } from "@/components/public/site-header";
+import { SiteHeaderServer } from "@/components/public/site-header-server";
 import { SiteFooter } from "@/components/public/site-footer";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
@@ -51,7 +51,7 @@ export default async function ArtigoPage({
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeaderServer />
       <main className="container py-16">
         <Link
           href="/blog"
