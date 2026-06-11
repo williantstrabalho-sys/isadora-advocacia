@@ -193,6 +193,7 @@ export type Contato = {
   assunto: string | null;
   mensagem: string;
   consentimento: boolean;
+  lido: boolean;
   created_at: string;
 };
 

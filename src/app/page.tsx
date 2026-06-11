@@ -10,6 +10,10 @@ import {
   ArrowRight,
   GraduationCap,
   Quote,
+  MessageCircle,
+  Mail,
+  Phone,
+  MapPin,
 } from "lucide-react";
 import { SiteHeaderServer } from "@/components/public/site-header-server";
 import { SiteFooter } from "@/components/public/site-footer";
@@ -33,6 +37,19 @@ export default async function HomePage() {
   const cfg = await getConfig();
   const depoimentos = await getDepoimentos();
   const c = await getConteudo();
+
+  // WhatsApp a partir do telefone configurado (acrescenta DDI 55 se faltar).
+  const telDigits = (cfg.telefone || "").replace(/\D/g, "");
+  const waNumero = telDigits
+    ? telDigits.startsWith("55")
+      ? telDigits
+      : `55${telDigits}`
+    : "";
+  const whatsappHref = waNumero
+    ? `https://wa.me/${waNumero}?text=${encodeURIComponent(
+        "Olá! Vim pelo site e gostaria de tirar uma dúvida."
+      )}`
+    : "";
 
   return (
     <>
@@ -225,17 +242,33 @@ export default async function HomePage() {
                   {c.contato.titulo}
                 </h2>
                 <p className="mt-3 text-brand-muted">{c.contato.subtitulo}</p>
+
+                {whatsappHref && (
+                  <a
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-6 inline-flex items-center gap-2 rounded-md bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
+                  >
+                    <MessageCircle className="h-4 w-4" /> Falar pelo WhatsApp
+                  </a>
+                )}
+
                 <div className="mt-8 space-y-3 text-sm text-brand-muted">
-                  <p>
-                    <span className="text-brand-text">E-mail:</span> {cfg.email}
-                  </p>
-                  <p>
-                    <span className="text-brand-text">Telefone:</span>{" "}
-                    {cfg.telefone}
-                  </p>
-                  <p>
-                    <span className="text-brand-text">Endereço:</span>{" "}
-                    {cfg.endereco}
+                  <a
+                    href={`mailto:${cfg.email}`}
+                    className="flex items-center gap-2 hover:text-brand-text"
+                  >
+                    <Mail className="h-4 w-4 text-brand-accent" /> {cfg.email}
+                  </a>
+                  <a
+                    href={`tel:${cfg.telefone.replace(/[^\d+]/g, "")}`}
+                    className="flex items-center gap-2 hover:text-brand-text"
+                  >
+                    <Phone className="h-4 w-4 text-brand-accent" /> {cfg.telefone}
+                  </a>
+                  <p className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-brand-accent" /> {cfg.endereco}
                   </p>
                 </div>
               </div>
