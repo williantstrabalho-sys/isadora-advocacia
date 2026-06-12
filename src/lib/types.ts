@@ -249,6 +249,10 @@ export type Database = {
         Args: { p_cliente_id: string };
         Returns: ClienteDetalhe[];
       };
+      acessos_por_pagina: {
+        Args: Record<string, never>;
+        Returns: { path: string; total: number }[];
+      };
       uso_projeto: {
         Args: Record<string, never>;
         Returns: {

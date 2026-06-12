@@ -10,16 +10,19 @@ import { createClient } from "@/lib/supabase/client";
  */
 export function AccessBeacon() {
   useEffect(() => {
+    const path = window.location.pathname;
     try {
-      if (sessionStorage.getItem("acesso-registrado")) return;
-      sessionStorage.setItem("acesso-registrado", "1");
+      // dedupe por página dentro da sessão (cada página conta 1x por sessão)
+      const chave = `acesso:${path}`;
+      if (sessionStorage.getItem(chave)) return;
+      sessionStorage.setItem(chave, "1");
     } catch {
       // sessionStorage indisponível — registra mesmo assim
     }
     const supabase = createClient();
     supabase
       .from("acessos")
-      .insert({ path: window.location.pathname })
+      .insert({ path })
       .then(() => {});
   }, []);
 

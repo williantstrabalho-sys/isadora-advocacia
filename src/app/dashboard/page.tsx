@@ -117,6 +117,7 @@ export default async function DashboardVisaoGeral() {
     { count: acessosHoje },
     { count: acessos7d },
     { data: uso },
+    { data: acessosPorPagina },
   ] = await Promise.all([
     supabase.from("acessos").select("*", { count: "exact", head: true }),
     supabase
@@ -128,7 +129,17 @@ export default async function DashboardVisaoGeral() {
       .select("*", { count: "exact", head: true })
       .gte("created_at", seteDiasISO),
     supabase.rpc("uso_projeto"),
+    supabase.rpc("acessos_por_pagina"),
   ]);
+
+  // nome amigável de cada página
+  const nomePagina = (p: string) => {
+    if (p === "/") return "Página inicial";
+    if (p === "/blog") return "Blog";
+    if (p.startsWith("/blog/")) return "Artigo: " + p.slice(6);
+    return p;
+  };
+  const topPaginas = (acessosPorPagina ?? []) as { path: string; total: number }[];
 
   const procs = processos ?? [];
   const fins = financeiro ?? [];
@@ -367,9 +378,31 @@ export default async function DashboardVisaoGeral() {
                 <p className="mt-1 text-xs text-brand-muted">últimos 7 dias</p>
               </div>
             </div>
+            {topPaginas.length > 0 && (
+              <div className="mt-4 border-t border-brand-border pt-3">
+                <p className="mb-2 text-xs uppercase tracking-wider text-brand-muted">
+                  Páginas mais acessadas
+                </p>
+                <ul className="space-y-1">
+                  {topPaginas.map((p) => (
+                    <li
+                      key={p.path}
+                      className="flex items-center justify-between gap-2 text-sm"
+                    >
+                      <span className="truncate text-brand-text">
+                        {nomePagina(p.path)}
+                      </span>
+                      <span className="shrink-0 tabular-nums text-brand-muted">
+                        {p.total}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <p className="mt-4 text-[11px] text-brand-muted">
-              Conta 1 visita por sessão do navegador, sem coletar dados pessoais
-              (LGPD).
+              Conta 1 visita por página por sessão do navegador, sem coletar
+              dados pessoais (LGPD).
             </p>
           </CardContent>
         </Card>

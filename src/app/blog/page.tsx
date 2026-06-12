@@ -4,6 +4,7 @@ import { SiteHeaderServer } from "@/components/public/site-header-server";
 import { SiteFooter } from "@/components/public/site-footer";
 import { Badge } from "@/components/ui/badge";
 import { createPublicClient } from "@/lib/supabase/public";
+import { AccessBeacon } from "@/components/public/access-beacon";
 import { formatData } from "@/lib/format";
 import type { BlogPost } from "@/lib/types";
 
@@ -35,6 +36,7 @@ export default async function BlogPage() {
 
   return (
     <>
+      <AccessBeacon />
       <SiteHeaderServer />
       <main className="container py-16">
         <header className="max-w-2xl">
