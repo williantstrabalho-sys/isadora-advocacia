@@ -9,7 +9,6 @@ import {
   Users,
   ArrowRight,
   GraduationCap,
-  Quote,
   MessageCircle,
   Mail,
   Phone,
@@ -18,6 +17,7 @@ import {
 import { SiteHeaderServer } from "@/components/public/site-header-server";
 import { SiteFooter } from "@/components/public/site-footer";
 import { ContactForm } from "@/components/public/contact-form";
+import { DepoimentosCarousel } from "@/components/public/depoimentos-carousel";
 import {
   Accordion,
   AccordionContent,
@@ -97,7 +97,8 @@ export default async function HomePage() {
               fill
               priority
               sizes="(max-width: 640px) 58vw, 50vw"
-              className="object-cover object-top"
+              className="object-cover"
+              style={{ objectPosition: c.imagens.hero_pos ?? "50% 20%" }}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-brand-bg via-brand-bg/70 to-transparent sm:via-brand-bg/55" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-bg via-transparent to-brand-bg/40" />
@@ -200,7 +201,8 @@ export default async function HomePage() {
                   alt={`${cfg.advogada_nome} — ${cfg.oab}`}
                   fill
                   sizes="(max-width: 1024px) 90vw, 50vw"
-                  className="object-cover object-center"
+                  className="object-cover"
+                  style={{ objectPosition: c.imagens.sobre_pos ?? "50% 50%" }}
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
                   <p className="font-display text-lg text-white">
@@ -222,22 +224,7 @@ export default async function HomePage() {
             <p className="mt-3 text-sm text-brand-muted">
               {c.depoimentos.subtitulo}
             </p>
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {depoimentos.map((dep, i) => (
-                <Card key={i}>
-                  <CardContent className="p-6">
-                    <Quote className="h-6 w-6 text-brand-accent" />
-                    <p className="mt-4 text-sm leading-relaxed text-brand-text/90">
-                      “{dep.texto}”
-                    </p>
-                    <p className="mt-6 text-sm font-medium text-brand-text">
-                      {dep.autor}
-                    </p>
-                    <p className="text-xs text-brand-muted">{dep.contexto}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <DepoimentosCarousel itens={depoimentos} />
           </div>
         </section>
 

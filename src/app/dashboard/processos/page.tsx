@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCNJ, formatBRL } from "@/lib/format";
-import { TIPO_ACAO_LABEL } from "@/lib/constants";
+import { tipoAcaoLabel, areaLabel } from "@/lib/areas-config";
 import type { Processo, Cliente } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +26,7 @@ type ProcessoComCliente = Processo & { clientes: { nome: string } | null };
 export default async function DashboardProcessos({
   searchParams,
 }: {
-  searchParams: { status?: string; tipo?: string; cliente?: string };
+  searchParams: { status?: string; area?: string; cliente?: string };
 }) {
   const { supabase, profile } = await requireStaff();
   const isAdmin = profile.role === "advogada";
@@ -37,7 +37,7 @@ export default async function DashboardProcessos({
     .order("created_at", { ascending: false });
 
   if (searchParams.status) query = query.eq("status", searchParams.status);
-  if (searchParams.tipo) query = query.eq("tipo_acao", searchParams.tipo);
+  if (searchParams.area) query = query.eq("area", searchParams.area);
   if (searchParams.cliente)
     query = query.eq("cliente_id", searchParams.cliente);
 
@@ -71,7 +71,7 @@ export default async function DashboardProcessos({
         titulo={isAdmin ? "Gestão de processos" : "Meus processos"}
         descricao={
           isAdmin
-            ? "Cadastro e acompanhamento dos processos trabalhistas."
+            ? "Cadastro e acompanhamento dos processos do escritório."
             : "Processos direcionados a você."
         }
         acao={
@@ -103,6 +103,7 @@ export default async function DashboardProcessos({
               <TableRow>
                 <TableHead>Número CNJ</TableHead>
                 <TableHead>Cliente</TableHead>
+                <TableHead>Área</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Vara</TableHead>
                 <TableHead>Valor</TableHead>
@@ -119,7 +120,10 @@ export default async function DashboardProcessos({
                     </Link>
                   </TableCell>
                   <TableCell>{p.clientes?.nome ?? "—"}</TableCell>
-                  <TableCell>{TIPO_ACAO_LABEL[p.tipo_acao]}</TableCell>
+                  <TableCell className="text-brand-muted">
+                    {areaLabel(p.area)}
+                  </TableCell>
+                  <TableCell>{tipoAcaoLabel(p.tipo_acao, p.area)}</TableCell>
                   <TableCell className="text-brand-muted">
                     {p.vara ?? "—"}
                   </TableCell>

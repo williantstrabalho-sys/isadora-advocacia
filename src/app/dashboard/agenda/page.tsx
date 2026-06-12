@@ -7,8 +7,8 @@ import { excluirEvento } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatData, diasAte } from "@/lib/format";
-import type { AgendaEvento, Processo } from "@/lib/types";
+import { formatData, formatCNJ, diasAte } from "@/lib/format";
+import type { AgendaEvento, Processo, Cliente } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -16,23 +16,31 @@ export const dynamic = "force-dynamic";
 export default async function DashboardAgenda() {
   const { supabase } = await requireStaff();
 
-  const [{ data: agendaData }, { data: procData }] = await Promise.all([
-    supabase
-      .from("agenda")
-      .select("*")
-      .order("data", { ascending: true })
-      .returns<AgendaEvento[]>(),
-    supabase
-      .from("processos")
-      .select("id, numero_cnj")
-      .order("created_at", { ascending: false })
-      .returns<Pick<Processo, "id" | "numero_cnj">[]>(),
-  ]);
+  const [{ data: agendaData }, { data: procData }, { data: cliData }] =
+    await Promise.all([
+      supabase
+        .from("agenda")
+        .select("*")
+        .order("data", { ascending: true })
+        .returns<AgendaEvento[]>(),
+      supabase
+        .from("processos")
+        .select("id, numero_cnj, cliente_id")
+        .order("created_at", { ascending: false })
+        .returns<Pick<Processo, "id" | "numero_cnj" | "cliente_id">[]>(),
+      supabase
+        .from("clientes")
+        .select("id, nome")
+        .order("nome")
+        .returns<Pick<Cliente, "id" | "nome">[]>(),
+    ]);
 
   const eventos = agendaData ?? [];
+  const clientes = cliData ?? [];
   const processos = (procData ?? []).map((p) => ({
     id: p.id,
-    nome: p.numero_cnj,
+    nome: formatCNJ(p.numero_cnj),
+    cliente_id: p.cliente_id,
   }));
 
   // futuros primeiro; passados ao final
@@ -45,7 +53,7 @@ export default async function DashboardAgenda() {
       <PageHeader
         titulo="Agenda e prazos"
         descricao="Audiências, prazos processuais, reuniões e perícias. Prazos com menos de 3 dias recebem alerta."
-        acao={<EventoForm processos={processos} />}
+        acao={<EventoForm clientes={clientes} processos={processos} />}
       />
 
       {ordenados.length === 0 ? (
@@ -120,8 +128,24 @@ export default async function DashboardAgenda() {
                         {dias === 0 ? "Hoje" : `${dias}d`}
                       </span>
                     )}
+                    {e.tipo === "REUNIAO" && e.cliente_ajuste && (
+                      <Badge className="border-amber-500/40 bg-amber-500/10 text-amber-400">
+                        Ajuste pedido
+                      </Badge>
+                    )}
+                    {e.tipo === "REUNIAO" &&
+                      e.cliente_de_acordo &&
+                      !e.cliente_ajuste && (
+                        <Badge className="border-emerald-500/40 bg-emerald-500/10 text-emerald-400">
+                          Cliente de acordo
+                        </Badge>
+                      )}
                     <TipoAgendaBadge tipo={e.tipo} />
-                    <EventoForm processos={processos} evento={e} />
+                    <EventoForm
+                      clientes={clientes}
+                      processos={processos}
+                      evento={e}
+                    />
                     <form action={excluirEvento}>
                       <input type="hidden" name="id" value={e.id} />
                       <Button type="submit" variant="ghost" size="icon">

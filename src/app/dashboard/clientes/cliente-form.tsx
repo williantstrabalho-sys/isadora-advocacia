@@ -8,6 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -15,14 +22,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { salvarCliente } from "./actions";
-import type { ClienteDetalhe } from "@/lib/types";
+import type { ClienteDetalhe, TipoPessoa } from "@/lib/types";
 
 export function ClienteForm({ cliente }: { cliente?: ClienteDetalhe }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
+  const [tipoPessoa, setTipoPessoa] = useState<TipoPessoa>(
+    cliente?.tipo_pessoa ?? "PF"
+  );
   const editando = Boolean(cliente);
+  const pj = tipoPessoa === "PJ";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -64,28 +75,40 @@ export function ClienteForm({ cliente }: { cliente?: ClienteDetalhe }) {
           {cliente && <input type="hidden" name="id" value={cliente.id} />}
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="nome">Nome completo *</Label>
-              <Input id="nome" name="nome" required defaultValue={cliente?.nome} />
+            <div className="space-y-1.5">
+              <Label htmlFor="tipo_pessoa">Tipo</Label>
+              <Select
+                name="tipo_pessoa"
+                value={tipoPessoa}
+                onValueChange={(v) => setTipoPessoa(v as TipoPessoa)}
+              >
+                <SelectTrigger id="tipo_pessoa">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PF">Pessoa física</SelectItem>
+                  <SelectItem value="PJ">Pessoa jurídica</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="cpf">CPF (armazenado criptografado)</Label>
+              <Label htmlFor="doc">
+                {pj ? "CNPJ" : "CPF"} (armazenado criptografado)
+              </Label>
               <Input
-                id="cpf"
-                name="cpf"
+                id="doc"
+                name="doc"
                 defaultValue={cliente?.cpf ?? ""}
-                placeholder="000.000.000-00"
+                placeholder={pj ? "00.000.000/0000-00" : "000.000.000-00"}
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="ctps">CTPS (criptografada)</Label>
-              <Input
-                id="ctps"
-                name="ctps"
-                defaultValue={cliente?.ctps ?? ""}
-                placeholder="0000000 / 000-DF"
-              />
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="nome">
+                {pj ? "Razão social *" : "Nome completo *"}
+              </Label>
+              <Input id="nome" name="nome" required defaultValue={cliente?.nome} />
             </div>
 
             <div className="space-y-1.5">
@@ -106,51 +129,17 @@ export function ClienteForm({ cliente }: { cliente?: ClienteDetalhe }) {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="data_nascimento">Data de nascimento</Label>
-              <Input
-                id="data_nascimento"
-                name="data_nascimento"
-                type="date"
-                defaultValue={cliente?.data_nascimento ?? ""}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="empresa_reclamada">Empresa reclamada</Label>
-              <Input
-                id="empresa_reclamada"
-                name="empresa_reclamada"
-                defaultValue={cliente?.empresa_reclamada ?? ""}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="data_admissao">Admissão</Label>
-              <Input
-                id="data_admissao"
-                name="data_admissao"
-                type="date"
-                defaultValue={cliente?.data_admissao ?? ""}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="data_demissao">Demissão</Label>
-              <Input
-                id="data_demissao"
-                name="data_demissao"
-                type="date"
-                defaultValue={cliente?.data_demissao ?? ""}
-              />
-            </div>
-
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="motivo_demissao">Motivo da demissão</Label>
-              <Input
-                id="motivo_demissao"
-                name="motivo_demissao"
-                defaultValue={cliente?.motivo_demissao ?? ""}
-              />
-            </div>
+            {!pj && (
+              <div className="space-y-1.5">
+                <Label htmlFor="data_nascimento">Data de nascimento</Label>
+                <Input
+                  id="data_nascimento"
+                  name="data_nascimento"
+                  type="date"
+                  defaultValue={cliente?.data_nascimento ?? ""}
+                />
+              </div>
+            )}
 
             <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="endereco">Endereço</Label>
@@ -171,6 +160,11 @@ export function ClienteForm({ cliente }: { cliente?: ClienteDetalhe }) {
               />
             </div>
           </div>
+
+          <p className="text-xs text-brand-muted">
+            Dados específicos do caso (vínculo de emprego, parte contrária, etc.)
+            são cadastrados no processo, de acordo com a área do Direito.
+          </p>
 
           {erro && (
             <p className="flex items-start gap-2 text-sm text-red-400">

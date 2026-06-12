@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 const NAV: NavItem[] = [
   { href: "/portal", label: "Painel", icon: "LayoutDashboard", exact: true },
   { href: "/portal/processos", label: "Meus processos", icon: "Briefcase" },
+  { href: "/portal/reunioes", label: "Reuniões", icon: "CalendarClock" },
   { href: "/portal/documentos", label: "Documentos", icon: "FileText" },
   { href: "/portal/mensagens", label: "Mensagens", icon: "MessageSquare" },
   { href: "/portal/honorarios", label: "Honorários", icon: "Wallet" },

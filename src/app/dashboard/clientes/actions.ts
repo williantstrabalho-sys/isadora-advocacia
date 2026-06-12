@@ -15,21 +15,19 @@ export async function salvarCliente(
   const { supabase } = await requireProfile("advogada");
 
   const id = formData.get("id") ? String(formData.get("id")) : null;
-  const cpfDigits = (str(formData, "cpf") ?? "").replace(/\D/g, "") || null;
+  const tipoPessoa = str(formData, "tipo_pessoa") === "PJ" ? "PJ" : "PF";
+  // documento: CPF (PF) ou CNPJ (PJ) — guardado criptografado
+  const docDigits = (str(formData, "doc") ?? "").replace(/\D/g, "") || null;
 
-  const { error } = await supabase.rpc("salvar_cliente", {
+  const { error } = await supabase.rpc("salvar_cliente_v2", {
     p_id: id,
     p_nome: str(formData, "nome"),
-    p_cpf: cpfDigits,
+    p_tipo_pessoa: tipoPessoa,
+    p_doc: docDigits,
     p_email: str(formData, "email"),
     p_telefone: str(formData, "telefone"),
     p_data_nascimento: str(formData, "data_nascimento"),
     p_endereco: str(formData, "endereco"),
-    p_empresa_reclamada: str(formData, "empresa_reclamada"),
-    p_ctps: str(formData, "ctps"),
-    p_data_admissao: str(formData, "data_admissao"),
-    p_data_demissao: str(formData, "data_demissao"),
-    p_motivo_demissao: str(formData, "motivo_demissao"),
     p_obs: str(formData, "obs"),
     p_profile_id: str(formData, "profile_id"),
   });

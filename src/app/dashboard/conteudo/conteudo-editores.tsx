@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import type { ConteudoSite } from "@/lib/cms-defaults";
 import { useSalvarBloco, BlocoCard, AddItem, RemoveItem } from "./editor-ui";
+import { ImagePositioner } from "./image-positioner";
 
 /* ----------------------------- HERO ----------------------------- */
 export function HeroEditor({ inicial }: { inicial: ConteudoSite["hero"] }) {
@@ -363,8 +364,24 @@ export function ImagensEditor({ inicial }: { inicial: ConteudoSite["imagens"] })
       erro={erro}
     >
       <UploadImagem campo="logo" label="Logo" atual={v.logo} onUrl={(url) => setV({ ...v, logo: url })} />
-      <UploadImagem campo="hero" label="Foto do topo (hero)" atual={v.hero} onUrl={(url) => setV({ ...v, hero: url })} />
-      <UploadImagem campo="sobre" label="Foto da seção Sobre" atual={v.sobre} onUrl={(url) => setV({ ...v, sobre: url })} />
+
+      <div>
+        <UploadImagem campo="hero" label="Foto do topo (hero)" atual={v.hero} onUrl={(url) => setV({ ...v, hero: url })} />
+        <ImagePositioner
+          src={v.hero}
+          value={v.hero_pos}
+          onChange={(pos) => setV({ ...v, hero_pos: pos })}
+        />
+      </div>
+
+      <div>
+        <UploadImagem campo="sobre" label="Foto da seção Sobre" atual={v.sobre} onUrl={(url) => setV({ ...v, sobre: url })} />
+        <ImagePositioner
+          src={v.sobre}
+          value={v.sobre_pos}
+          onChange={(pos) => setV({ ...v, sobre_pos: pos })}
+        />
+      </div>
     </BlocoCard>
   );
 }

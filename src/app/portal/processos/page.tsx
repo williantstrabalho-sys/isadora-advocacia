@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { formatCNJ } from "@/lib/format";
-import { TIPO_ACAO_LABEL } from "@/lib/constants";
+import { tipoAcaoLabel, areaLabel } from "@/lib/areas-config";
 import type { Processo } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +32,7 @@ export default async function PortalProcessos() {
     <>
       <PageHeader
         titulo="Meus processos"
-        descricao="Relação dos seus processos trabalhistas em acompanhamento."
+        descricao="Relação dos seus processos em acompanhamento."
       />
 
       {processos.length === 0 ? (
@@ -47,6 +47,7 @@ export default async function PortalProcessos() {
             <TableHeader>
               <TableRow>
                 <TableHead>Número CNJ</TableHead>
+                <TableHead>Área</TableHead>
                 <TableHead>Tipo de ação</TableHead>
                 <TableHead>Vara</TableHead>
                 <TableHead>Fase</TableHead>
@@ -62,9 +63,14 @@ export default async function PortalProcessos() {
                       {formatCNJ(p.numero_cnj)}
                     </Link>
                   </TableCell>
+                  <TableCell className="text-brand-muted">
+                    <Link href={`/portal/processos/${p.id}`}>
+                      {areaLabel(p.area)}
+                    </Link>
+                  </TableCell>
                   <TableCell>
                     <Link href={`/portal/processos/${p.id}`}>
-                      {TIPO_ACAO_LABEL[p.tipo_acao]}
+                      {tipoAcaoLabel(p.tipo_acao, p.area)}
                     </Link>
                   </TableCell>
                   <TableCell className="text-brand-muted">

@@ -16,14 +16,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatBRL, formatData } from "@/lib/format";
-import { TIPO_LANCAMENTO_LABEL, TIPO_ACAO_LABEL } from "@/lib/constants";
-import type { Financeiro, Cliente, Processo, TipoAcaoTrabalhista } from "@/lib/types";
+import { formatBRL, formatData, formatCNJ } from "@/lib/format";
+import { TIPO_LANCAMENTO_LABEL } from "@/lib/constants";
+import { tipoAcaoLabel } from "@/lib/areas-config";
+import type { AreaDireito } from "@/lib/areas-config";
+import type { Financeiro, Cliente, Processo } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 type LancComProc = Financeiro & {
-  processos: { tipo_acao: TipoAcaoTrabalhista } | null;
+  processos: { tipo_acao: string; area: AreaDireito } | null;
 };
 
 export default async function DashboardFinanceiro() {
@@ -33,7 +35,7 @@ export default async function DashboardFinanceiro() {
     await Promise.all([
       supabase
         .from("financeiro")
-        .select("*, processos(tipo_acao)")
+        .select("*, processos(tipo_acao, area)")
         .order("vencimento", { ascending: false })
         .returns<LancComProc[]>(),
       supabase
@@ -43,16 +45,17 @@ export default async function DashboardFinanceiro() {
         .returns<Pick<Cliente, "id" | "nome">[]>(),
       supabase
         .from("processos")
-        .select("id, numero_cnj")
+        .select("id, numero_cnj, cliente_id")
         .order("created_at", { ascending: false })
-        .returns<Pick<Processo, "id" | "numero_cnj">[]>(),
+        .returns<Pick<Processo, "id" | "numero_cnj" | "cliente_id">[]>(),
     ]);
 
   const lancamentos = lancData ?? [];
   const clientes = cliData ?? [];
   const processos = (procData ?? []).map((p) => ({
     id: p.id,
-    nome: p.numero_cnj,
+    nome: formatCNJ(p.numero_cnj),
+    cliente_id: p.cliente_id,
   }));
 
   const agora = new Date();
@@ -70,15 +73,12 @@ export default async function DashboardFinanceiro() {
     .reduce((s, l) => s + Number(l.valor), 0);
   const resultado = receitaMes - despesasMes;
 
-  // Receita por tipo de ação trabalhista (honorários pagos)
+  // Receita por tipo de ação (honorários pagos)
   const porTipoMap: Record<string, number> = {};
   lancamentos
     .filter((l) => l.tipo === "HONORARIO" && l.status === "PAGO" && l.processos)
     .forEach((l) => {
-      const t = TIPO_ACAO_LABEL[l.processos!.tipo_acao].replace(
-        "Trabalhista",
-        ""
-      ).trim();
+      const t = tipoAcaoLabel(l.processos!.tipo_acao, l.processos!.area);
       porTipoMap[t] = (porTipoMap[t] ?? 0) + Number(l.valor);
     });
   const porTipo = Object.entries(porTipoMap).map(([tipo, total]) => ({
@@ -118,7 +118,7 @@ export default async function DashboardFinanceiro() {
       {porTipo.length > 0 && (
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Receita por tipo de ação trabalhista</CardTitle>
+            <CardTitle>Receita por tipo de ação</CardTitle>
           </CardHeader>
           <CardContent>
             <BarChartBrand data={porTipo} xKey="tipo" barKey="total" />

@@ -5,6 +5,7 @@ import { PageHeader, EmptyState } from "@/components/app/ui-bits";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { desde } from "@/lib/format";
+import { AtendimentoTabs } from "../atendimento-tabs";
 import type { Cliente, Mensagem } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -47,9 +48,10 @@ export default async function DashboardMensagens() {
   return (
     <>
       <PageHeader
-        titulo="Mensagens"
-        descricao="Conversas com todos os clientes do escritório."
+        titulo="Atendimento"
+        descricao="Conversas com clientes e mensagens recebidas pelo site."
       />
+      <AtendimentoTabs />
 
       {resumo.length === 0 ? (
         <EmptyState

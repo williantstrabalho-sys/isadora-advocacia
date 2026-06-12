@@ -6,22 +6,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatCNJ } from "@/lib/format";
-import {
-  TIPO_ACAO_LABEL,
-  RESULTADO_LABEL,
-  RESULTADO_COLOR,
-} from "@/lib/constants";
-import type {
-  ProcessoGestao,
-  TipoAcaoTrabalhista,
-  ResultadoProcesso,
-} from "@/lib/types";
+import { RESULTADO_LABEL, RESULTADO_COLOR } from "@/lib/constants";
+import { areaLabel } from "@/lib/areas-config";
+import type { AreaDireito } from "@/lib/areas-config";
+import type { ProcessoGestao, ResultadoProcesso } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 type Row = ProcessoGestao & {
   processos: {
-    tipo_acao: TipoAcaoTrabalhista;
+    area: AreaDireito;
+    tipo_acao: string;
     numero_cnj: string;
     clientes: { nome: string } | null;
   } | null;
@@ -32,7 +27,7 @@ export default async function DashboardLicoes() {
 
   const { data } = await supabase
     .from("processo_gestao")
-    .select("*, processos(tipo_acao, numero_cnj, clientes(nome))")
+    .select("*, processos(area, tipo_acao, numero_cnj, clientes(nome))")
     .not("licoes_aprendidas", "is", null)
     .returns<Row[]>();
 
@@ -40,20 +35,20 @@ export default async function DashboardLicoes() {
     (r) => (r.licoes_aprendidas ?? "").trim().length > 0
   );
 
-  // Agrupa por tipo de ação
-  const grupos = new Map<TipoAcaoTrabalhista, Row[]>();
+  // Agrupa por área do Direito
+  const grupos = new Map<AreaDireito, Row[]>();
   for (const r of linhas) {
-    const tipo = r.processos?.tipo_acao;
-    if (!tipo) continue;
-    if (!grupos.has(tipo)) grupos.set(tipo, []);
-    grupos.get(tipo)!.push(r);
+    const area = r.processos?.area;
+    if (!area) continue;
+    if (!grupos.has(area)) grupos.set(area, []);
+    grupos.get(area)!.push(r);
   }
 
   return (
     <>
       <PageHeader
         titulo="Lições aprendidas"
-        descricao="Base de conhecimento do escritório — aprendizados de cada processo, organizados por tipo de ação."
+        descricao="Base de conhecimento do escritório — aprendizados de cada processo, organizados por área do Direito."
       />
 
       {linhas.length === 0 ? (
@@ -64,11 +59,11 @@ export default async function DashboardLicoes() {
         />
       ) : (
         <div className="space-y-8">
-          {Array.from(grupos.entries()).map(([tipo, rows]) => (
-            <div key={tipo}>
+          {Array.from(grupos.entries()).map(([area, rows]) => (
+            <div key={area}>
               <div className="mb-3 flex items-center gap-2">
                 <h2 className="font-display text-lg font-semibold">
-                  {TIPO_ACAO_LABEL[tipo]}
+                  {areaLabel(area)}
                 </h2>
                 <Badge className="border-brand-border bg-brand-elevated text-brand-muted">
                   {rows.length}

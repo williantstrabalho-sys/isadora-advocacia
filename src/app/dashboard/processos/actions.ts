@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { requireProfile, requireStaff } from "@/lib/auth";
+import { AREAS } from "@/lib/areas-config";
+import type { AreaDireito } from "@/lib/areas-config";
 
 function parseList(raw: FormDataEntryValue | null): string[] {
   if (!raw) return [];
@@ -16,13 +18,29 @@ function nullableDate(raw: FormDataEntryValue | null): string | null {
   return v || null;
 }
 
+function str(formData: FormData, k: string): string | null {
+  const v = formData.get(k);
+  const s = v ? String(v).trim() : "";
+  return s || null;
+}
+
 export async function salvarProcesso(formData: FormData) {
   const { supabase, profile } = await requireStaff();
   const isAdmin = profile.role === "advogada";
   const id = formData.get("id") ? String(formData.get("id")) : null;
 
+  const area = (String(formData.get("area") || "TRABALHISTA") as AreaDireito);
+  const cfg = AREAS[area] ?? AREAS.TRABALHISTA;
+
+  // Coleta os campos específicos da área (prefixo area_) em dados_area jsonb.
+  const dadosArea: Record<string, string | null> = {};
+  for (const campo of cfg.campos) {
+    dadosArea[campo.name] = str(formData, `area_${campo.name}`);
+  }
+
   // Campos editáveis tanto pela advogada quanto pelo associado responsável.
   const dados = {
+    area,
     numero_cnj: String(formData.get("numero_cnj") || "").trim(),
     tipo_acao: String(formData.get("tipo_acao")),
     vara: String(formData.get("vara") || "").trim() || null,
@@ -31,6 +49,13 @@ export async function salvarProcesso(formData: FormData) {
     valor_causa: formData.get("valor_causa")
       ? Number(formData.get("valor_causa"))
       : null,
+    parte_contraria_nome: str(formData, "parte_contraria_nome"),
+    parte_contraria_doc: (str(formData, "parte_contraria_doc") ?? "").replace(
+      /\D/g,
+      ""
+    ) || null,
+    parte_contraria_tipo: str(formData, "parte_contraria_tipo"),
+    dados_area: dadosArea,
     data_distribuicao: nullableDate(formData.get("data_distribuicao")),
     data_audiencia: nullableDate(formData.get("data_audiencia")),
     pedidos: parseList(formData.get("pedidos")),

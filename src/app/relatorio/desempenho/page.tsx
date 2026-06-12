@@ -1,18 +1,10 @@
 import { requireProfile } from "@/lib/auth";
 import { AutoPrint } from "@/components/app/auto-print";
 import { formatBRL, formatData } from "@/lib/format";
-import {
-  TIPO_ACAO_LABEL,
-  RESULTADO_LABEL,
-  ESCRITORIO,
-} from "@/lib/constants";
+import { RESULTADO_LABEL, ESCRITORIO } from "@/lib/constants";
+import { AREA_OPTIONS, areaLabel } from "@/lib/areas-config";
 import { getConfig } from "@/lib/settings";
-import type {
-  Processo,
-  ProcessoGestao,
-  TipoAcaoTrabalhista,
-  ResultadoProcesso,
-} from "@/lib/types";
+import type { Processo, ProcessoGestao, ResultadoProcesso } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -72,23 +64,21 @@ export default async function RelatorioDesempenho() {
     }))
     .filter((d) => d.total > 0);
 
-  const porTipo = (Object.keys(TIPO_ACAO_LABEL) as TipoAcaoTrabalhista[])
-    .map((tipo) => {
-      const gs = gestoes.filter(
-        (g) => procById.get(g.processo_id)?.tipo_acao === tipo
-      );
-      const dec = gs.filter((g) => g.resultado !== "EM_ANDAMENTO");
-      const ex = dec.filter((g) =>
-        ["FAVORAVEL", "PARCIAL", "ACORDO"].includes(g.resultado)
-      ).length;
-      return {
-        label: TIPO_ACAO_LABEL[tipo],
-        total: gs.length,
-        decididos: dec.length,
-        exitoPct: dec.length ? Math.round((ex / dec.length) * 100) : null,
-      };
-    })
-    .filter((t) => t.total > 0);
+  const porArea = AREA_OPTIONS.map(({ value }) => {
+    const gs = gestoes.filter(
+      (g) => procById.get(g.processo_id)?.area === value
+    );
+    const dec = gs.filter((g) => g.resultado !== "EM_ANDAMENTO");
+    const ex = dec.filter((g) =>
+      ["FAVORAVEL", "PARCIAL", "ACORDO"].includes(g.resultado)
+    ).length;
+    return {
+      label: areaLabel(value),
+      total: gs.length,
+      decididos: dec.length,
+      exitoPct: dec.length ? Math.round((ex / dec.length) * 100) : null,
+    };
+  }).filter((t) => t.total > 0);
 
   const cell = { padding: "6px 8px", borderBottom: "1px solid #eee" } as const;
   const th = { padding: "6px 8px", textAlign: "left" as const };
@@ -149,18 +139,18 @@ export default async function RelatorioDesempenho() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-base font-semibold">Aproveitamento por tipo de ação</h2>
+          <h2 className="mb-2 text-base font-semibold">Aproveitamento por área do Direito</h2>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
             <thead>
               <tr style={{ borderBottom: "1px solid #ccc" }}>
-                <th style={th}>Tipo de ação</th>
+                <th style={th}>Área</th>
                 <th style={th}>Casos</th>
                 <th style={th}>Decididos</th>
                 <th style={th}>Taxa de êxito</th>
               </tr>
             </thead>
             <tbody>
-              {porTipo.map((t) => (
+              {porArea.map((t) => (
                 <tr key={t.label}>
                   <td style={cell}>{t.label}</td>
                   <td style={cell}>{t.total}</td>

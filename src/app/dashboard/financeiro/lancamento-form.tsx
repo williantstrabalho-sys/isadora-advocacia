@@ -23,6 +23,11 @@ import {
   TIPO_LANCAMENTO_LABEL,
   STATUS_FINANCEIRO_LABEL,
 } from "@/lib/constants";
+import {
+  ClienteProcessoSelect,
+  type ClienteOpt,
+  type ProcessoOpt,
+} from "@/components/app/cliente-processo-select";
 import { salvarLancamento } from "./actions";
 import type {
   Financeiro,
@@ -30,15 +35,13 @@ import type {
   StatusFinanceiro,
 } from "@/lib/types";
 
-type Opt = { id: string; nome: string };
-
 export function LancamentoForm({
   clientes,
   processos,
   lancamento,
 }: {
-  clientes: Opt[];
-  processos: Opt[];
+  clientes: ClienteOpt[];
+  processos: ProcessoOpt[];
   lancamento?: Financeiro;
 }) {
   const [open, setOpen] = useState(false);
@@ -159,43 +162,12 @@ export function LancamentoForm({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="cliente_id">Cliente</Label>
-              <Select
-                name="cliente_id"
-                defaultValue={lancamento?.cliente_id ?? undefined}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Opcional" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clientes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="processo_id">Processo vinculado</Label>
-              <Select
-                name="processo_id"
-                defaultValue={lancamento?.processo_id ?? undefined}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Opcional" />
-                </SelectTrigger>
-                <SelectContent>
-                  {processos.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <ClienteProcessoSelect
+              clientes={clientes}
+              processos={processos}
+              defaultClienteId={lancamento?.cliente_id}
+              defaultProcessoId={lancamento?.processo_id}
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-2">

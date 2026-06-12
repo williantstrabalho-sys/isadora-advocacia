@@ -20,13 +20,16 @@ type Opt = { id: string; nome: string };
 export function DashboardDocUpload({
   clientes,
   processos,
+  clienteFixoId,
 }: {
   clientes: Opt[];
   processos: { id: string; nome: string; cliente_id: string }[];
+  /** quando usado na ficha de um cliente: já fixa o cliente e oculta o seletor */
+  clienteFixoId?: string;
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [clienteId, setClienteId] = useState<string>("");
+  const [clienteId, setClienteId] = useState<string>(clienteFixoId ?? "");
   const [processoId, setProcessoId] = useState<string>("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -83,18 +86,20 @@ export function DashboardDocUpload({
 
   return (
     <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-      <Select value={clienteId} onValueChange={setClienteId}>
-        <SelectTrigger className="sm:w-48">
-          <SelectValue placeholder="Cliente" />
-        </SelectTrigger>
-        <SelectContent>
-          {clientes.map((c) => (
-            <SelectItem key={c.id} value={c.id}>
-              {c.nome}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {!clienteFixoId && (
+        <Select value={clienteId} onValueChange={setClienteId}>
+          <SelectTrigger className="sm:w-48">
+            <SelectValue placeholder="Cliente" />
+          </SelectTrigger>
+          <SelectContent>
+            {clientes.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.nome}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
 
       <Select
         value={processoId}

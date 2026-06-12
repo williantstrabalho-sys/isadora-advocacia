@@ -12,11 +12,7 @@ const NAV_ADMIN: NavItem[] = [
   { href: "/dashboard/agenda", label: "Agenda", icon: "Calendar" },
   { href: "/dashboard/documentos", label: "Documentos", icon: "FolderOpen" },
   { href: "/dashboard/licoes", label: "Lições aprendidas", icon: "BookOpen" },
-  { href: "/dashboard/mensagens", label: "Mensagens", icon: "MessageSquare" },
-  { href: "/dashboard/contatos", label: "Contatos recebidos", icon: "Inbox" },
-  { href: "/dashboard/blog", label: "Blog", icon: "Newspaper" },
-  { href: "/dashboard/depoimentos", label: "Depoimentos", icon: "Quote" },
-  { href: "/dashboard/equipe", label: "Equipe", icon: "UserCog" },
+  { href: "/dashboard/mensagens", label: "Atendimento", icon: "MessageSquare" },
   { href: "/dashboard/configuracoes", label: "Configurações", icon: "Settings" },
 ];
 

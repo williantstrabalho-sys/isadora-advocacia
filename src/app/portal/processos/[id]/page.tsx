@@ -7,7 +7,7 @@ import { StatusProcessoBadge } from "@/components/app/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCNJ, formatData, formatDataHora, formatBRL, formatTamanho } from "@/lib/format";
-import { TIPO_ACAO_LABEL } from "@/lib/constants";
+import { tipoAcaoLabel, areaLabel, areaConfig } from "@/lib/areas-config";
 import type { Processo, Documento } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -45,8 +45,10 @@ export default async function ProcessoDetalhe({
       </Link>
 
       <PageHeader
-        titulo={TIPO_ACAO_LABEL[processo.tipo_acao]}
-        descricao={formatCNJ(processo.numero_cnj)}
+        titulo={tipoAcaoLabel(processo.tipo_acao, processo.area)}
+        descricao={`${areaLabel(processo.area)} · ${formatCNJ(
+          processo.numero_cnj
+        )}`}
         acao={<StatusProcessoBadge status={processo.status} />}
       />
 
@@ -57,7 +59,10 @@ export default async function ProcessoDetalhe({
           </CardHeader>
           <CardContent>
             <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-              <Field label="Vara">{processo.vara ?? "—"}</Field>
+              <Field label={areaConfig(processo.area).contrariaLabel}>
+                {processo.parte_contraria_nome ?? "—"}
+              </Field>
+              <Field label="Vara/Juízo">{processo.vara ?? "—"}</Field>
               <Field label="Fase">{processo.fase ?? "—"}</Field>
               <Field label="Status">
                 <StatusProcessoBadge status={processo.status} />

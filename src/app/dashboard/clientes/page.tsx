@@ -21,10 +21,10 @@ export default async function DashboardClientes() {
 
   const { data } = await supabase
     .from("clientes")
-    .select("id, nome, email, telefone, empresa_reclamada")
+    .select("id, nome, email, telefone, tipo_pessoa")
     .order("nome")
     .returns<
-      Pick<Cliente, "id" | "nome" | "email" | "telefone" | "empresa_reclamada">[]
+      Pick<Cliente, "id" | "nome" | "email" | "telefone" | "tipo_pessoa">[]
     >();
   const clientes = data ?? [];
 
@@ -32,7 +32,7 @@ export default async function DashboardClientes() {
     <>
       <PageHeader
         titulo="Clientes"
-        descricao="Cadastro de clientes. CPF e CTPS são armazenados criptografados."
+        descricao="Cadastro de clientes. CPF/CNPJ é armazenado criptografado. Os processos de cada cliente ficam na ficha dele."
         acao={<ClienteForm />}
       />
 
@@ -50,7 +50,7 @@ export default async function DashboardClientes() {
                 <TableHead>Nome</TableHead>
                 <TableHead>E-mail</TableHead>
                 <TableHead>Telefone</TableHead>
-                <TableHead>Empresa reclamada</TableHead>
+                <TableHead>Tipo</TableHead>
                 <TableHead></TableHead>
               </TableRow>
             </TableHeader>
@@ -67,7 +67,7 @@ export default async function DashboardClientes() {
                     {c.telefone ?? "—"}
                   </TableCell>
                   <TableCell className="text-brand-muted">
-                    {c.empresa_reclamada ?? "—"}
+                    {c.tipo_pessoa === "PJ" ? "Pessoa jurídica" : "Pessoa física"}
                   </TableCell>
                   <TableCell>
                     <Link href={`/dashboard/clientes/${c.id}`}>

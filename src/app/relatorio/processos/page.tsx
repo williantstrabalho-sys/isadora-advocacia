@@ -1,11 +1,8 @@
 import { requireProfile } from "@/lib/auth";
 import { AutoPrint } from "@/components/app/auto-print";
 import { formatCNJ, formatBRL, formatData } from "@/lib/format";
-import {
-  TIPO_ACAO_LABEL,
-  STATUS_PROCESSO_LABEL,
-  ESCRITORIO,
-} from "@/lib/constants";
+import { STATUS_PROCESSO_LABEL, ESCRITORIO } from "@/lib/constants";
+import { tipoAcaoLabel, areaLabel } from "@/lib/areas-config";
 import type { Processo } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +35,7 @@ export default async function RelatorioProcessos() {
             <tr className="border-b border-gray-300 text-left">
               <th className="p-1.5">Nº CNJ</th>
               <th className="p-1.5">Cliente</th>
+              <th className="p-1.5">Área</th>
               <th className="p-1.5">Tipo</th>
               <th className="p-1.5">Vara</th>
               <th className="p-1.5">Valor</th>
@@ -49,7 +47,8 @@ export default async function RelatorioProcessos() {
               <tr key={p.id} className="border-b border-gray-100">
                 <td className="p-1.5 font-mono">{formatCNJ(p.numero_cnj)}</td>
                 <td className="p-1.5">{p.clientes?.nome ?? "—"}</td>
-                <td className="p-1.5">{TIPO_ACAO_LABEL[p.tipo_acao]}</td>
+                <td className="p-1.5">{areaLabel(p.area)}</td>
+                <td className="p-1.5">{tipoAcaoLabel(p.tipo_acao, p.area)}</td>
                 <td className="p-1.5">{p.vara ?? "—"}</td>
                 <td className="p-1.5">{formatBRL(p.valor_causa)}</td>
                 <td className="p-1.5">{STATUS_PROCESSO_LABEL[p.status]}</td>

@@ -28,11 +28,11 @@ import {
   diasAte,
 } from "@/lib/format";
 import {
-  TIPO_ACAO_LABEL,
   RESULTADO_LABEL,
   RESULTADO_COLOR,
   RESULTADO_OPTIONS,
 } from "@/lib/constants";
+import { tipoAcaoLabel, areaLabel, areaConfig } from "@/lib/areas-config";
 import type { Processo, Cliente, ProcessoGestao } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -118,10 +118,10 @@ export default async function DashboardProcessoDetalhe({
       </Link>
 
       <PageHeader
-        titulo={TIPO_ACAO_LABEL[processo.tipo_acao]}
-        descricao={`${formatCNJ(processo.numero_cnj)} · ${
-          processo.clientes?.nome ?? ""
-        }`}
+        titulo={tipoAcaoLabel(processo.tipo_acao, processo.area)}
+        descricao={`${areaLabel(processo.area)} · ${formatCNJ(
+          processo.numero_cnj
+        )} · ${processo.clientes?.nome ?? ""}`}
         acao={
           <div className="flex items-center gap-2">
             <StatusProcessoBadge status={processo.status} />
@@ -150,8 +150,14 @@ export default async function DashboardProcessoDetalhe({
           </CardHeader>
           <CardContent>
             <dl className="grid grid-cols-2 gap-4">
-              <Field label="Cliente">{processo.clientes?.nome ?? "—"}</Field>
-              <Field label="Vara">{processo.vara ?? "—"}</Field>
+              <Field label="Área">{areaLabel(processo.area)}</Field>
+              <Field label={areaConfig(processo.area).clienteLabel}>
+                {processo.clientes?.nome ?? "—"}
+              </Field>
+              <Field label={areaConfig(processo.area).contrariaLabel}>
+                {processo.parte_contraria_nome ?? "—"}
+              </Field>
+              <Field label="Vara/Juízo">{processo.vara ?? "—"}</Field>
               <Field label="Fase">{processo.fase ?? "—"}</Field>
               <Field label="Distribuição">
                 {formatData(processo.data_distribuicao)}
@@ -165,6 +171,25 @@ export default async function DashboardProcessoDetalhe({
                 {formatBRL(processo.valor_causa)}
               </Field>
             </dl>
+
+            {/* Campos específicos da área */}
+            {(() => {
+              const campos = areaConfig(processo.area).campos.filter(
+                (c) => processo.dados_area?.[c.name]
+              );
+              if (campos.length === 0) return null;
+              return (
+                <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-brand-border pt-4">
+                  {campos.map((c) => (
+                    <Field key={c.name} label={c.label}>
+                      {c.type === "date"
+                        ? formatData(processo.dados_area[c.name])
+                        : processo.dados_area[c.name]}
+                    </Field>
+                  ))}
+                </dl>
+              );
+            })()}
             {processo.pedidos?.length > 0 && (
               <div className="mt-6">
                 <p className="text-xs uppercase tracking-wider text-brand-muted">

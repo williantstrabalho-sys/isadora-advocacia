@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDataHora } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { AtendimentoTabs } from "../atendimento-tabs";
 import type { Contato } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -25,13 +26,14 @@ export default async function DashboardContatos() {
   return (
     <>
       <PageHeader
-        titulo="Contatos recebidos"
+        titulo="Atendimento"
         descricao={
           novos > 0
             ? `${novos} novo(s) contato(s) do formulário do site.`
             : "Mensagens enviadas pelo formulário de contato do site."
         }
       />
+      <AtendimentoTabs />
 
       {contatos.length === 0 ? (
         <EmptyState

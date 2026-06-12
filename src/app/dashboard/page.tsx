@@ -28,13 +28,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatBRL, formatData, diasAte } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { TIPO_ACAO_LABEL, RESULTADO_LABEL } from "@/lib/constants";
+import { RESULTADO_LABEL } from "@/lib/constants";
+import { AREA_OPTIONS, areaLabel } from "@/lib/areas-config";
 import type {
   Processo,
   Cliente,
   Financeiro,
   AgendaEvento,
-  TipoAcaoTrabalhista,
   ProcessoGestao,
   ResultadoProcesso,
 } from "@/lib/types";
@@ -111,13 +111,11 @@ export default async function DashboardVisaoGeral() {
   const hojeKey = formatData(agora);
   const agendaHoje = eventos.filter((e) => formatData(e.data) === hojeKey);
 
-  // Gráfico de barras: processos por tipo
-  const porTipo = (Object.keys(TIPO_ACAO_LABEL) as TipoAcaoTrabalhista[])
-    .map((tipo) => ({
-      tipo: TIPO_ACAO_LABEL[tipo].replace("Trabalhista", "").trim(),
-      total: procs.filter((p) => p.tipo_acao === tipo).length,
-    }))
-    .filter((d) => d.total > 0);
+  // Gráfico de barras: processos por área do Direito
+  const porTipo = AREA_OPTIONS.map(({ value }) => ({
+    tipo: areaLabel(value),
+    total: procs.filter((p) => p.area === value).length,
+  })).filter((d) => d.total > 0);
 
   // Gráfico de linha: receita mensal últimos 6 meses
   const receitaPorMes: Record<string, number> = {};
@@ -196,28 +194,26 @@ export default async function DashboardVisaoGeral() {
     }))
     .filter((d) => d.total > 0);
 
-  // Aproveitamento por tipo de ação
-  const aprovPorTipo = (Object.keys(TIPO_ACAO_LABEL) as TipoAcaoTrabalhista[])
-    .map((tipo) => {
-      const gs = gestoes.filter(
-        (g) => procById.get(g.processo_id)?.tipo_acao === tipo
-      );
-      const dec = gs.filter((g) => g.resultado !== "EM_ANDAMENTO");
-      const ex = dec.filter((g) =>
-        ["FAVORAVEL", "PARCIAL", "ACORDO"].includes(g.resultado)
-      ).length;
-      const ped = gs.reduce((s, g) => s + (Number(g.valor_pedido) || 0), 0);
-      const obt = gs.reduce((s, g) => s + (Number(g.valor_sentenca) || 0), 0);
-      return {
-        tipo,
-        label: TIPO_ACAO_LABEL[tipo],
-        total: gs.length,
-        decididos: dec.length,
-        exitoPct: dec.length ? Math.round((ex / dec.length) * 100) : null,
-        aprovPct: ped > 0 ? Math.round((obt / ped) * 100) : null,
-      };
-    })
-    .filter((t) => t.total > 0);
+  // Aproveitamento por área do Direito
+  const aprovPorTipo = AREA_OPTIONS.map(({ value }) => {
+    const gs = gestoes.filter(
+      (g) => procById.get(g.processo_id)?.area === value
+    );
+    const dec = gs.filter((g) => g.resultado !== "EM_ANDAMENTO");
+    const ex = dec.filter((g) =>
+      ["FAVORAVEL", "PARCIAL", "ACORDO"].includes(g.resultado)
+    ).length;
+    const ped = gs.reduce((s, g) => s + (Number(g.valor_pedido) || 0), 0);
+    const obt = gs.reduce((s, g) => s + (Number(g.valor_sentenca) || 0), 0);
+    return {
+      tipo: value,
+      label: areaLabel(value),
+      total: gs.length,
+      decididos: dec.length,
+      exitoPct: dec.length ? Math.round((ex / dec.length) * 100) : null,
+      aprovPct: ped > 0 ? Math.round((obt / ped) * 100) : null,
+    };
+  }).filter((t) => t.total > 0);
 
   // Alerta de prescrição bienal (art. 7º, XXIX, CF): 2 anos após o fim do contrato
   const PRESC_ALERTA_DIAS = 180;
@@ -274,7 +270,7 @@ export default async function DashboardVisaoGeral() {
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Processos por tipo</CardTitle>
+            <CardTitle>Processos por área</CardTitle>
           </CardHeader>
           <CardContent>
             {porTipo.length === 0 ? (
@@ -349,7 +345,7 @@ export default async function DashboardVisaoGeral() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Aproveitamento por tipo de ação</CardTitle>
+              <CardTitle>Aproveitamento por área do Direito</CardTitle>
             </CardHeader>
             <CardContent>
               {aprovPorTipo.length === 0 ? (

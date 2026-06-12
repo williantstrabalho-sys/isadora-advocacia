@@ -11,7 +11,7 @@ import { PageHeader, StatCard, EmptyState } from "@/components/app/ui-bits";
 import { StatusProcessoBadge } from "@/components/app/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatData, formatCNJ, diasAte } from "@/lib/format";
-import { TIPO_ACAO_LABEL } from "@/lib/constants";
+import { tipoAcaoLabel } from "@/lib/areas-config";
 import type { Processo, Documento, Mensagem } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -122,7 +122,7 @@ export default async function PortalPainel() {
                     >
                       <div>
                         <p className="text-sm font-medium">
-                          {TIPO_ACAO_LABEL[p.tipo_acao]}
+                          {tipoAcaoLabel(p.tipo_acao, p.area)}
                         </p>
                         <p className="text-xs text-brand-muted">
                           {formatCNJ(p.numero_cnj)}

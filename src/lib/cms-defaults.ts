@@ -29,7 +29,14 @@ export type ConteudoSite = {
   };
   depoimentos: { titulo: string; subtitulo: string };
   contato: { titulo: string; subtitulo: string };
-  imagens: { logo: string; hero: string; sobre: string };
+  imagens: {
+    logo: string;
+    hero: string;
+    sobre: string;
+    /** object-position (ex.: "50% 30%") para enquadrar sem cortar */
+    hero_pos?: string;
+    sobre_pos?: string;
+  };
 };
 
 export const CONTEUDO_PADRAO: ConteudoSite = {
@@ -140,5 +147,7 @@ export const CONTEUDO_PADRAO: ConteudoSite = {
     logo: "/logo.png",
     hero: "/isadora-hero.png",
     sobre: "/isadora-sobre.png",
+    hero_pos: "50% 20%",
+    sobre_pos: "50% 50%",
   },
 };

@@ -21,20 +21,27 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { TIPO_AGENDA_LABEL } from "@/lib/constants";
+import {
+  ClienteProcessoSelect,
+  type ClienteOpt,
+  type ProcessoOpt,
+} from "@/components/app/cliente-processo-select";
 import { salvarEvento } from "./actions";
 import type { AgendaEvento, TipoAgenda } from "@/lib/types";
 
-type Opt = { id: string; nome: string };
-
 export function EventoForm({
+  clientes,
   processos,
   evento,
 }: {
-  processos: Opt[];
+  clientes: ClienteOpt[];
+  processos: ProcessoOpt[];
   evento?: AgendaEvento;
 }) {
   const [open, setOpen] = useState(false);
+  const [tipo, setTipo] = useState<TipoAgenda>(evento?.tipo ?? "PRAZO");
   const editando = Boolean(evento);
+  const reuniao = tipo === "REUNIAO";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -49,7 +56,7 @@ export function EventoForm({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editando ? "Editar evento" : "Novo evento"}</DialogTitle>
         </DialogHeader>
@@ -79,10 +86,11 @@ export function EventoForm({
               <Label htmlFor="tipo">Tipo *</Label>
               <Select
                 name="tipo"
-                defaultValue={evento?.tipo ?? "PRAZO"}
+                value={tipo}
+                onValueChange={(v) => setTipo(v as TipoAgenda)}
                 required
               >
-                <SelectTrigger>
+                <SelectTrigger id="tipo">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -94,24 +102,23 @@ export function EventoForm({
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-1.5">
-              <Label htmlFor="processo_id">Processo vinculado</Label>
-              <Select
-                name="processo_id"
-                defaultValue={evento?.processo_id ?? undefined}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Opcional" />
-                </SelectTrigger>
-                <SelectContent>
-                  {processos.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="local">Local</Label>
+              <Input
+                id="local"
+                name="local"
+                defaultValue={evento?.local ?? ""}
+                placeholder="Fórum / Sala / Online..."
+              />
             </div>
+
+            <ClienteProcessoSelect
+              clientes={clientes}
+              processos={processos}
+              defaultClienteId={evento?.cliente_id}
+              defaultProcessoId={evento?.processo_id}
+            />
 
             <div className="space-y-1.5">
               <Label htmlFor="data">Data *</Label>
@@ -133,18 +140,21 @@ export function EventoForm({
               />
             </div>
 
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="local">Local</Label>
-              <Input
-                id="local"
-                name="local"
-                defaultValue={evento?.local ?? ""}
-                placeholder="TRT-10 / Sala de audiências..."
-              />
-            </div>
+            {reuniao && (
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="pauta">Pauta da reunião</Label>
+                <Textarea
+                  id="pauta"
+                  name="pauta"
+                  rows={4}
+                  defaultValue={evento?.pauta ?? ""}
+                  placeholder="Tópicos a tratar / ata da reunião — o cliente verá isto no portal e poderá marcar 'de acordo' ou pedir ajuste."
+                />
+              </div>
+            )}
 
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="obs">Observações</Label>
+              <Label htmlFor="obs">Observações internas</Label>
               <Textarea
                 id="obs"
                 name="obs"

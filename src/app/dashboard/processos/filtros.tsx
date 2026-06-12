@@ -8,7 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TIPO_ACAO_OPTIONS, STATUS_PROCESSO_LABEL } from "@/lib/constants";
+import { STATUS_PROCESSO_LABEL } from "@/lib/constants";
+import { AREA_OPTIONS } from "@/lib/areas-config";
 import type { StatusProcesso } from "@/lib/types";
 
 type ClienteOpt = { id: string; nome: string };
@@ -46,15 +47,15 @@ export function ProcessoFiltros({ clientes }: { clientes: ClienteOpt[] }) {
       </Select>
 
       <Select
-        defaultValue={params.get("tipo") ?? TODOS}
-        onValueChange={(v) => setParam("tipo", v)}
+        defaultValue={params.get("area") ?? TODOS}
+        onValueChange={(v) => setParam("area", v)}
       >
         <SelectTrigger>
-          <SelectValue placeholder="Tipo de ação" />
+          <SelectValue placeholder="Área do Direito" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={TODOS}>Todos os tipos</SelectItem>
-          {TIPO_ACAO_OPTIONS.map((o) => (
+          <SelectItem value={TODOS}>Todas as áreas</SelectItem>
+          {AREA_OPTIONS.map((o) => (
             <SelectItem key={o.value} value={o.value}>
               {o.label}
             </SelectItem>

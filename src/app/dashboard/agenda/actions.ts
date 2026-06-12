@@ -15,12 +15,14 @@ export async function salvarEvento(formData: FormData) {
 
   const payload = {
     advogada_id: profile.id,
+    cliente_id: nn(formData, "cliente_id"),
     processo_id: nn(formData, "processo_id"),
     tipo: String(formData.get("tipo") || "PRAZO"),
     titulo: String(formData.get("titulo") || "").trim(),
     data: String(formData.get("data")),
     hora: nn(formData, "hora"),
     local: nn(formData, "local"),
+    pauta: nn(formData, "pauta"),
     obs: nn(formData, "obs"),
   };
 
