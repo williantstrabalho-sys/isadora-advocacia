@@ -370,7 +370,14 @@ export function ImagensEditor({ inicial }: { inicial: ConteudoSite["imagens"] })
         <ImagePositioner
           src={v.hero}
           value={v.hero_pos}
+          zoom={v.hero_zoom ?? 1}
+          previews={[
+            { label: "Celular", ratio: 0.35 },
+            { label: "Tablet", ratio: 0.76 },
+            { label: "Notebook", ratio: 1.0 },
+          ]}
           onChange={(pos) => setV({ ...v, hero_pos: pos })}
+          onZoomChange={(z) => setV({ ...v, hero_zoom: z })}
         />
       </div>
 
@@ -379,7 +386,10 @@ export function ImagensEditor({ inicial }: { inicial: ConteudoSite["imagens"] })
         <ImagePositioner
           src={v.sobre}
           value={v.sobre_pos}
+          zoom={v.sobre_zoom ?? 1}
+          previews={[{ label: "No site (3:2, igual em todas as telas)", ratio: 1.5 }]}
           onChange={(pos) => setV({ ...v, sobre_pos: pos })}
+          onZoomChange={(z) => setV({ ...v, sobre_zoom: z })}
         />
       </div>
     </BlocoCard>

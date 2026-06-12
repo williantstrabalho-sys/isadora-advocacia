@@ -89,7 +89,7 @@ export default async function HomePage() {
         <section className="relative overflow-hidden border-b border-brand-border">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 w-[58%] sm:w-3/5 lg:w-1/2"
+            className="pointer-events-none absolute inset-y-0 right-0 w-[58%] overflow-hidden sm:w-3/5 lg:w-1/2"
           >
             <Image
               src={c.imagens.hero}
@@ -98,7 +98,11 @@ export default async function HomePage() {
               priority
               sizes="(max-width: 640px) 58vw, 50vw"
               className="object-cover"
-              style={{ objectPosition: c.imagens.hero_pos ?? "50% 20%" }}
+              style={{
+                objectPosition: c.imagens.hero_pos ?? "50% 20%",
+                transform: `scale(${c.imagens.hero_zoom ?? 1})`,
+                transformOrigin: c.imagens.hero_pos ?? "50% 20%",
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-brand-bg via-brand-bg/70 to-transparent sm:via-brand-bg/55" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-bg via-transparent to-brand-bg/40" />
@@ -202,7 +206,11 @@ export default async function HomePage() {
                   fill
                   sizes="(max-width: 1024px) 90vw, 50vw"
                   className="object-cover"
-                  style={{ objectPosition: c.imagens.sobre_pos ?? "50% 50%" }}
+                  style={{
+                    objectPosition: c.imagens.sobre_pos ?? "50% 50%",
+                    transform: `scale(${c.imagens.sobre_zoom ?? 1})`,
+                    transformOrigin: c.imagens.sobre_pos ?? "50% 50%",
+                  }}
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
                   <p className="font-display text-lg text-white">

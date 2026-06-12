@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Smartphone, Tablet, Monitor, Move } from "lucide-react";
+import { Move, ZoomIn } from "lucide-react";
 
 function parse(pos: string | undefined): { x: number; y: number } {
   const m = (pos ?? "50% 50%").match(/(-?\d+(?:\.\d+)?)%\s+(-?\d+(?:\.\d+)?)%/);
@@ -9,31 +9,35 @@ function parse(pos: string | undefined): { x: number; y: number } {
   return { x: Number(m[1]), y: Number(m[2]) };
 }
 
-const FRAMES = [
-  { label: "Celular", icon: Smartphone, ratio: "9 / 16", w: "w-20" },
-  { label: "Tablet", icon: Tablet, ratio: "3 / 4", w: "w-28" },
-  { label: "Computador", icon: Monitor, ratio: "16 / 9", w: "w-44" },
-];
+export type PreviewFrame = { label: string; ratio: number };
 
 /**
- * Reposiciona o "ponto focal" da imagem (object-position) arrastando sobre a
- * foto INTEIRA — assim nada "foge" do cursor. As prévias mostram como a foto
- * fica recortada em celular, tablet e computador. Emite "X% Y%".
+ * Ajusta o enquadramento da imagem para um "slot" do site:
+ *  - arraste o ponto sobre a foto INTEIRA para escolher o ponto focal (object-position);
+ *  - use o zoom para aproximar/afastar (scale ancorado no ponto focal).
+ * As prévias usam as PROPORÇÕES REAIS de como a foto aparece no site.
  */
 export function ImagePositioner({
   src,
   value,
+  zoom = 1,
+  previews,
   onChange,
+  onZoomChange,
 }: {
   src: string;
   value?: string;
+  zoom?: number;
+  previews: PreviewFrame[];
   onChange: (pos: string) => void;
+  onZoomChange: (zoom: number) => void;
 }) {
   const { x, y } = parse(value);
   const areaRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
   const [ratio, setRatio] = useState<number>(16 / 9);
   const pos = `${x}% ${y}%`;
+  const transform = `scale(${zoom})`;
 
   function setFromEvent(clientX: number, clientY: number) {
     const el = areaRef.current;
@@ -52,86 +56,101 @@ export function ImagePositioner({
     );
   }
 
+  const PREVIEW_H = 104; // px — altura fixa das prévias
+
   return (
     <div className="mt-3 space-y-3">
       <p className="flex items-center gap-1.5 text-xs text-brand-muted">
         <Move className="h-3.5 w-3.5" />
-        Arraste o ponto sobre a foto para escolher o que deve ficar no centro do
-        recorte. As prévias mostram o resultado em cada tela.
+        Arraste o ponto sobre a foto para escolher o que fica no centro do
+        recorte. As prévias mostram o tamanho real em cada tela.
       </p>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
         {/* Foto inteira — área de edição */}
-        <div
-          ref={areaRef}
-          className="relative w-full max-w-md shrink-0 cursor-crosshair touch-none select-none overflow-hidden rounded-md border border-brand-border bg-brand-bg"
-          style={{ aspectRatio: String(ratio) }}
-          onPointerDown={(e) => {
-            e.currentTarget.setPointerCapture(e.pointerId);
-            setDragging(true);
-            setFromEvent(e.clientX, e.clientY);
-          }}
-          onPointerMove={(e) => {
-            if (dragging) setFromEvent(e.clientX, e.clientY);
-          }}
-          onPointerUp={(e) => {
-            setDragging(false);
-            e.currentTarget.releasePointerCapture(e.pointerId);
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={src}
-            alt="Ajustar enquadramento"
-            onLoad={(e) => {
-              const im = e.currentTarget;
-              if (im.naturalWidth && im.naturalHeight)
-                setRatio(im.naturalWidth / im.naturalHeight);
+        <div className="w-full max-w-md shrink-0 space-y-3">
+          <div
+            ref={areaRef}
+            className="relative w-full cursor-crosshair touch-none select-none overflow-hidden rounded-md border border-brand-border bg-brand-bg"
+            style={{ aspectRatio: String(ratio) }}
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture(e.pointerId);
+              setDragging(true);
+              setFromEvent(e.clientX, e.clientY);
             }}
-            className="pointer-events-none absolute inset-0 h-full w-full object-contain"
-          />
-          {/* linhas-guia */}
-          <div
-            className="pointer-events-none absolute inset-y-0 w-px bg-white/40"
-            style={{ left: `${x}%` }}
-          />
-          <div
-            className="pointer-events-none absolute inset-x-0 h-px bg-white/40"
-            style={{ top: `${y}%` }}
-          />
-          <div
-            className="pointer-events-none absolute h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-brand-accent/40 shadow-[0_0_0_2px_rgba(0,0,0,0.5)]"
-            style={{ left: `${x}%`, top: `${y}%` }}
-          />
+            onPointerMove={(e) => {
+              if (dragging) setFromEvent(e.clientX, e.clientY);
+            }}
+            onPointerUp={(e) => {
+              setDragging(false);
+              e.currentTarget.releasePointerCapture(e.pointerId);
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt="Ajustar enquadramento"
+              onLoad={(e) => {
+                const im = e.currentTarget;
+                if (im.naturalWidth && im.naturalHeight)
+                  setRatio(im.naturalWidth / im.naturalHeight);
+              }}
+              className="pointer-events-none absolute inset-0 h-full w-full object-contain"
+            />
+            <div
+              className="pointer-events-none absolute inset-y-0 w-px bg-white/40"
+              style={{ left: `${x}%` }}
+            />
+            <div
+              className="pointer-events-none absolute inset-x-0 h-px bg-white/40"
+              style={{ top: `${y}%` }}
+            />
+            <div
+              className="pointer-events-none absolute h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-brand-accent/40 shadow-[0_0_0_2px_rgba(0,0,0,0.5)]"
+              style={{ left: `${x}%`, top: `${y}%` }}
+            />
+          </div>
+
+          {/* Zoom */}
+          <div className="flex items-center gap-2">
+            <ZoomIn className="h-4 w-4 shrink-0 text-brand-muted" />
+            <input
+              type="range"
+              min={1}
+              max={3}
+              step={0.1}
+              value={zoom}
+              onChange={(e) => onZoomChange(Number(e.target.value))}
+              className="h-2 w-full cursor-pointer accent-brand-accent"
+            />
+            <span className="w-10 shrink-0 text-right text-xs tabular-nums text-brand-muted">
+              {zoom.toFixed(1)}x
+            </span>
+          </div>
         </div>
 
-        {/* Prévias por dispositivo */}
-        <div className="flex items-end gap-3">
-          {FRAMES.map((f) => {
-            const Icon = f.icon;
-            return (
-              <div key={f.label} className="flex flex-col items-center gap-1">
-                <div
-                  className={`${f.w} overflow-hidden rounded-md border border-brand-border`}
-                  style={{ aspectRatio: f.ratio }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt={f.label}
-                    className="h-full w-full object-cover"
-                    style={{ objectPosition: pos }}
-                  />
-                </div>
-                <span className="flex items-center gap-1 text-[10px] text-brand-muted">
-                  <Icon className="h-3 w-3" /> {f.label}
-                </span>
+        {/* Prévias com a proporção real de cada tela */}
+        <div className="flex flex-wrap items-end gap-3">
+          {previews.map((f) => (
+            <div key={f.label} className="flex flex-col items-center gap-1">
+              <div
+                className="overflow-hidden rounded-md border border-brand-border"
+                style={{ height: PREVIEW_H, width: PREVIEW_H * f.ratio }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt={f.label}
+                  className="h-full w-full object-cover"
+                  style={{ objectPosition: pos, transform, transformOrigin: pos }}
+                />
               </div>
-            );
-          })}
+              <span className="text-[10px] text-brand-muted">{f.label}</span>
+            </div>
+          ))}
         </div>
       </div>
       <p className="text-[11px] text-brand-muted">
-        Posição atual: {pos}. Depois de ajustar, clique em{" "}
+        Posição: {pos} · Zoom: {zoom.toFixed(1)}x. Depois de ajustar, clique em{" "}
         <strong>Salvar</strong> no bloco acima.
       </p>
     </div>

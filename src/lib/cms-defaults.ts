@@ -36,6 +36,9 @@ export type ConteudoSite = {
     /** object-position (ex.: "50% 30%") para enquadrar sem cortar */
     hero_pos?: string;
     sobre_pos?: string;
+    /** zoom (scale) ancorado no ponto focal; 1 = sem zoom */
+    hero_zoom?: number;
+    sobre_zoom?: number;
   };
 };
 
@@ -149,5 +152,7 @@ export const CONTEUDO_PADRAO: ConteudoSite = {
     sobre: "/isadora-sobre.png",
     hero_pos: "50% 20%",
     sobre_pos: "50% 50%",
+    hero_zoom: 1,
+    sobre_zoom: 1,
   },
 };
