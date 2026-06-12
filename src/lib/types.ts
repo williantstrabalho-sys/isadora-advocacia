@@ -249,6 +249,14 @@ export type Database = {
         Args: { p_cliente_id: string };
         Returns: ClienteDetalhe[];
       };
+      uso_projeto: {
+        Args: Record<string, never>;
+        Returns: {
+          db_bytes: number;
+          storage_bytes: number;
+          acessos_total: number;
+        };
+      };
       agenda_feedback: {
         Args: {
           p_id: string;

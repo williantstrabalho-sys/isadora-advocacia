@@ -11,6 +11,10 @@ import {
   Trophy,
   FileDown,
   ShieldAlert,
+  Eye,
+  Database,
+  HardDrive,
+  ExternalLink,
 } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { PageHeader, StatCard, EmptyState } from "@/components/app/ui-bits";
@@ -48,6 +52,36 @@ function ymKey(d: Date) {
 }
 const MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
+function UsoBarra({
+  icon,
+  label,
+  detalhe,
+  pct,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  detalhe: string;
+  pct: number;
+}) {
+  const cor =
+    pct >= 80 ? "bg-red-500" : pct >= 60 ? "bg-amber-500" : "bg-brand-accent";
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-xs">
+        <span className="flex items-center gap-1.5 text-brand-text">
+          {icon} {label}
+        </span>
+        <span className="text-brand-muted">
+          {detalhe} ({pct}%)
+        </span>
+      </div>
+      <div className="h-2 w-full overflow-hidden rounded-full bg-brand-elevated">
+        <div className={cn("h-full rounded-full", cor)} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
 export default async function DashboardVisaoGeral() {
   const { supabase, profile } = await requireProfile("advogada");
 
@@ -74,6 +108,27 @@ export default async function DashboardVisaoGeral() {
     .from("processo_gestao")
     .select("*")
     .returns<ProcessoGestao[]>();
+
+  // --- Métricas: acessos ao site e uso do Supabase ---
+  const inicioHojeISO = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+  const seteDiasISO = new Date(Date.now() - 7 * 86400000).toISOString();
+  const [
+    { count: acessosTotal },
+    { count: acessosHoje },
+    { count: acessos7d },
+    { data: uso },
+  ] = await Promise.all([
+    supabase.from("acessos").select("*", { count: "exact", head: true }),
+    supabase
+      .from("acessos")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", inicioHojeISO),
+    supabase
+      .from("acessos")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", seteDiasISO),
+    supabase.rpc("uso_projeto"),
+  ]);
 
   const procs = processos ?? [];
   const fins = financeiro ?? [];
@@ -227,6 +282,22 @@ export default async function DashboardVisaoGeral() {
     .filter((p) => p.dias != null && p.dias <= PRESC_ALERTA_DIAS)
     .sort((a, b) => (a.dias ?? 0) - (b.dias ?? 0));
 
+  // --- Uso do Supabase (limites do plano free) ---
+  const DB_LIMIT = 500 * 1024 * 1024; // 500 MB
+  const STORAGE_LIMIT = 1024 * 1024 * 1024; // 1 GB
+  const usoData = uso as
+    | { db_bytes: number; storage_bytes: number }
+    | null;
+  const mb = (b: number) => (b / 1048576).toFixed(1);
+  const dbPct = usoData
+    ? Math.min(100, Math.round((usoData.db_bytes / DB_LIMIT) * 100))
+    : 0;
+  const stPct = usoData
+    ? Math.min(100, Math.round((usoData.storage_bytes / STORAGE_LIMIT) * 100))
+    : 0;
+  const SUPABASE_USO_URL =
+    "https://supabase.com/dashboard/project/ujzkanvdlnmltmkwenqg/settings/billing/usage";
+
   return (
     <>
       <PageHeader
@@ -265,6 +336,82 @@ export default async function DashboardVisaoGeral() {
           icon={AlertTriangle}
           alerta={prazosCriticos.length > 0}
         />
+      </div>
+
+      {/* Acessos ao site + uso do Supabase */}
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="h-4 w-4 text-brand-accent" /> Acessos ao site
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-end gap-8">
+              <div>
+                <p className="font-display text-3xl font-bold leading-none">
+                  {acessosTotal ?? 0}
+                </p>
+                <p className="mt-1 text-xs text-brand-muted">total de visitas</p>
+              </div>
+              <div>
+                <p className="font-display text-xl font-semibold leading-none">
+                  {acessosHoje ?? 0}
+                </p>
+                <p className="mt-1 text-xs text-brand-muted">hoje</p>
+              </div>
+              <div>
+                <p className="font-display text-xl font-semibold leading-none">
+                  {acessos7d ?? 0}
+                </p>
+                <p className="mt-1 text-xs text-brand-muted">últimos 7 dias</p>
+              </div>
+            </div>
+            <p className="mt-4 text-[11px] text-brand-muted">
+              Conta 1 visita por sessão do navegador, sem coletar dados pessoais
+              (LGPD).
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-4 w-4 text-brand-accent" /> Uso do Supabase
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {usoData ? (
+              <>
+                <UsoBarra
+                  icon={<Database className="h-3.5 w-3.5" />}
+                  label="Banco de dados"
+                  detalhe={`${mb(usoData.db_bytes)} MB de 500 MB`}
+                  pct={dbPct}
+                />
+                <UsoBarra
+                  icon={<HardDrive className="h-3.5 w-3.5" />}
+                  label="Armazenamento (arquivos)"
+                  detalhe={`${mb(usoData.storage_bytes)} MB de 1024 MB`}
+                  pct={stPct}
+                />
+              </>
+            ) : (
+              <p className="text-sm text-brand-muted">
+                Não foi possível ler o uso agora.
+              </p>
+            )}
+            <a
+              href={SUPABASE_USO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-brand-accent hover:underline"
+            >
+              Ver banda/tráfego mensal no painel da Supabase{" "}
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">

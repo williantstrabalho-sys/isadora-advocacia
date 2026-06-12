@@ -18,6 +18,7 @@ import { SiteHeaderServer } from "@/components/public/site-header-server";
 import { SiteFooter } from "@/components/public/site-footer";
 import { ContactForm } from "@/components/public/contact-form";
 import { DepoimentosCarousel } from "@/components/public/depoimentos-carousel";
+import { AccessBeacon } from "@/components/public/access-beacon";
 import {
   Accordion,
   AccordionContent,
@@ -83,6 +84,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <AccessBeacon />
       <SiteHeaderServer />
       <main>
         {/* HERO */}
