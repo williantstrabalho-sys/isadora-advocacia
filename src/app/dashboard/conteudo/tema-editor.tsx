@@ -197,7 +197,12 @@ export function TemaEditor({
                 </div>
                 <div className="flex items-center justify-between gap-1 px-3 py-2">
                   <div>
-                    <p className="text-xs font-medium">{p.nome}</p>
+                    <p className="flex items-center gap-1.5 text-xs font-medium">
+                      {p.nome}
+                      <span className="rounded bg-brand-elevated px-1 py-0.5 text-[9px] uppercase tracking-wide text-brand-muted">
+                        {p.modo}
+                      </span>
+                    </p>
                     <p className="text-[10px] text-brand-muted">{p.descricao}</p>
                   </div>
                   {ativo && <Check className="h-4 w-4 shrink-0 text-brand-accent" />}

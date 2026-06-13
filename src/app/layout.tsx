@@ -4,7 +4,7 @@ import "./globals.css";
 import { ESCRITORIO, SITE_URL } from "@/lib/constants";
 import { CookieConsent } from "@/components/public/cookie-consent";
 import { getTema } from "@/lib/settings";
-import { temaParaVars } from "@/lib/cores";
+import { temaParaVars, schemeDe } from "@/lib/cores";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,8 +38,13 @@ export default async function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${inter.variable} dark`}
-      style={temaParaVars(tema) as React.CSSProperties}
+      className={inter.variable}
+      style={
+        {
+          ...temaParaVars(tema),
+          colorScheme: schemeDe(tema),
+        } as React.CSSProperties
+      }
     >
       <body className="min-h-screen bg-brand-bg font-sans">
         {children}

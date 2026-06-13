@@ -124,66 +124,123 @@ export function contraste(c1: string, c2: string): number {
   return +((a + 0.05) / (b + 0.05)).toFixed(2);
 }
 
-export type PaletaSugerida = { id: string; nome: string; descricao: string; tema: Tema };
+export type PaletaSugerida = {
+  id: string;
+  nome: string;
+  descricao: string;
+  modo: "claro" | "escuro";
+  tema: Tema;
+};
+
+/** Destaque visível sobre fundo escuro (clareado se necessário). */
+function accentEscuro(h: number, s: number, l: number) {
+  const L = clamp(l, 46, 66);
+  const S = clamp(s, 45, 95);
+  return { accent: hslParaHex(h, S, L), accentHover: hslParaHex(h, S, clamp(L + 9, 0, 82)) };
+}
+/** Destaque visível sobre fundo claro (escurecido se necessário). */
+function accentClaro(h: number, s: number, l: number) {
+  const L = clamp(l, 38, 52);
+  const S = clamp(s, 50, 95);
+  return { accent: hslParaHex(h, S, L), accentHover: hslParaHex(h, S, clamp(L - 9, 18, 100)) };
+}
+
+/** Paleta ESCURA "tom da marca" (usada nas sugestões e no toggle do portal). */
+export function temaEscuro(accentHex: string): Tema {
+  const { h, s, l } = hexParaHsl(accentHex);
+  const a = accentEscuro(h, s, l);
+  return {
+    bg: hslParaHex(h, 12, 5),
+    surface: hslParaHex(h, 11, 8),
+    elevated: hslParaHex(h, 10, 13),
+    border: hslParaHex(h, 9, 20),
+    text: "#f5f5f4",
+    muted: hslParaHex(h, 6, 60),
+    accent: a.accent,
+    accentHover: a.accentHover,
+  };
+}
+/** Paleta CLARA "tom da marca" (usada nas sugestões e no toggle do portal). */
+export function temaClaro(accentHex: string): Tema {
+  const { h, s, l } = hexParaHsl(accentHex);
+  const a = accentClaro(h, s, l);
+  return {
+    bg: hslParaHex(h, 30, 98),
+    surface: "#ffffff",
+    elevated: hslParaHex(h, 24, 96),
+    border: hslParaHex(h, 18, 89),
+    text: hslParaHex(h, 14, 13),
+    muted: hslParaHex(h, 8, 42),
+    accent: a.accent,
+    accentHover: a.accentHover,
+  };
+}
+
+/** { claro, escuro } a partir da cor da marca — para o seletor do portal. */
+export function temaClaroEscuro(accentHex: string): { claro: Tema; escuro: Tema } {
+  return { claro: temaClaro(accentHex), escuro: temaEscuro(accentHex) };
+}
+
+/** 'light' | 'dark' conforme a luminância do fundo (para color-scheme). */
+export function schemeDe(tema: Tema): "light" | "dark" {
+  return luminancia(tema.bg) > 0.5 ? "light" : "dark";
+}
 
 /**
- * Gera 3 paletas escuras harmônicas a partir de uma cor de destaque (da logo).
- * Mantém texto claro e contraste seguro; varia o tratamento do fundo.
+ * Gera paletas harmônicas (escuras e claras) a partir da cor da logo.
+ * Texto e destaque com contraste seguro em cada modo.
  */
 export function gerarPaletas(accentHex: string): PaletaSugerida[] {
-  const base = hexParaHsl(accentHex);
-  // Garante que o destaque seja visível sobre fundo escuro.
-  const accentL = clamp(base.l, 46, 66);
-  const accentS = clamp(base.s, 45, 95);
-  const accent = hslParaHex(base.h, accentS, accentL);
-  const accentHover = hslParaHex(base.h, accentS, clamp(accentL + 9, 0, 80));
-  const h = base.h;
+  const { h, s, l } = hexParaHsl(accentHex);
+  const ad = accentEscuro(h, s, l);
+  const ac = accentClaro(h, s, l);
 
   return [
     {
-      id: "classico",
-      nome: "Escuro clássico",
-      descricao: "Fundo preto neutro, destaque na cor da marca.",
+      id: "onix",
+      nome: "Ônix",
+      descricao: "Escuro · preto neutro, destaque da marca.",
+      modo: "escuro",
       tema: {
-        bg: "#0a0a0a",
-        surface: "#111111",
-        elevated: "#1a1a1a",
-        border: "#2a2a2a",
-        text: "#f0f0f0",
-        muted: "#8a8a8a",
-        accent,
-        accentHover,
+        bg: "#0a0a0a", surface: "#111111", elevated: "#1a1a1a", border: "#2a2a2a",
+        text: "#f0f0f0", muted: "#8a8a8a", accent: ad.accent, accentHover: ad.accentHover,
       },
     },
     {
-      id: "tonalizado",
-      nome: "Tonalizado pela marca",
-      descricao: "Fundo escuro levemente tingido com o tom da logo.",
+      id: "marca-escura",
+      nome: "Marca escura",
+      descricao: "Escuro · fundo tingido com o tom da logo.",
+      modo: "escuro",
+      tema: temaEscuro(accentHex),
+    },
+    {
+      id: "grafite",
+      nome: "Grafite",
+      descricao: "Escuro · grafite com mais profundidade.",
+      modo: "escuro",
       tema: {
-        bg: hslParaHex(h, 12, 5),
-        surface: hslParaHex(h, 11, 8),
-        elevated: hslParaHex(h, 10, 13),
-        border: hslParaHex(h, 9, 20),
-        text: "#f5f5f4",
-        muted: hslParaHex(h, 6, 60),
-        accent,
-        accentHover,
+        bg: hslParaHex(h, 16, 7), surface: hslParaHex(h, 14, 11),
+        elevated: hslParaHex(h, 13, 16), border: hslParaHex(h, 11, 26),
+        text: "#ffffff", muted: "#a1a1aa",
+        accent: hslParaHex(h, clamp(s + 4, 0, 100), clamp(l, 46, 66)), accentHover: ad.accentHover,
       },
     },
     {
-      id: "elegante",
-      nome: "Carvão elegante",
-      descricao: "Fundo grafite com mais profundidade e bordas suaves.",
+      id: "perola",
+      nome: "Pérola",
+      descricao: "Claro · branco clean, leitura suave.",
+      modo: "claro",
       tema: {
-        bg: hslParaHex(h, 16, 7),
-        surface: hslParaHex(h, 14, 11),
-        elevated: hslParaHex(h, 13, 16),
-        border: hslParaHex(h, 11, 26),
-        text: "#ffffff",
-        muted: "#a1a1aa",
-        accent: hslParaHex(h, clamp(accentS + 4, 0, 100), accentL),
-        accentHover,
+        bg: "#f8f8f7", surface: "#ffffff", elevated: "#f1f1ef", border: "#e4e4e2",
+        text: "#1c1917", muted: "#6b6b6b", accent: ac.accent, accentHover: ac.accentHover,
       },
+    },
+    {
+      id: "areia",
+      nome: "Areia",
+      descricao: "Claro · fundo levemente tingido com o tom da logo.",
+      modo: "claro",
+      tema: temaClaro(accentHex),
     },
   ];
 }
