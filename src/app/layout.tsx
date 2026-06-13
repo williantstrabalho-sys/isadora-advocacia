@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ESCRITORIO, SITE_URL } from "@/lib/constants";
 import { CookieConsent } from "@/components/public/cookie-consent";
+import { getTema } from "@/lib/settings";
+import { temaParaVars } from "@/lib/cores";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,13 +28,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const tema = await getTema();
+
   return (
-    <html lang="pt-BR" className={`${inter.variable} dark`}>
+    <html
+      lang="pt-BR"
+      className={`${inter.variable} dark`}
+      style={temaParaVars(tema) as React.CSSProperties}
+    >
       <body className="min-h-screen bg-brand-bg font-sans">
         {children}
         <CookieConsent />

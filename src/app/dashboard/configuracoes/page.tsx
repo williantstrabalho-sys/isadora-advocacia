@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { salvarConfig } from "./actions";
 import { ExpandableCard } from "./expandable-card";
+import { TemaEditor } from "../conteudo/tema-editor";
 import {
   HeroEditor,
   EspecialidadesEditor,
@@ -126,6 +127,9 @@ export default async function DashboardConfiguracoes() {
             </div>
           </form>
         </ExpandableCard>
+
+        {/* Cores do site e do sistema (tema) */}
+        <TemaEditor logoUrl={c.imagens.logo} temaInicial={c.tema} />
 
         {/* Conteúdo da página inicial (CMS) — fechado por padrão (extenso) */}
         <ExpandableCard

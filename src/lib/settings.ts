@@ -1,6 +1,7 @@
 import { createPublicClient } from "@/lib/supabase/public";
 import { ESCRITORIO, DEPOIMENTOS } from "@/lib/constants";
 import { CONTEUDO_PADRAO, type ConteudoSite } from "@/lib/cms-defaults";
+import { TEMA_PADRAO, type Tema } from "@/lib/cores";
 import type { Configuracao, Depoimento } from "@/lib/types";
 
 export type SiteConfig = {
@@ -79,6 +80,24 @@ export async function getConteudo(): Promise<ConteudoSite> {
   } catch {
     return CONTEUDO_PADRAO;
   }
+}
+
+/** Lê só o tema de cores (para o layout raiz). Nunca lança. */
+export async function getTema(): Promise<Tema> {
+  try {
+    const supabase = createPublicClient();
+    const { data } = await supabase
+      .from("site_conteudo")
+      .select("valor")
+      .eq("chave", "tema")
+      .maybeSingle<{ valor: Partial<Tema> }>();
+    if (data?.valor && typeof data.valor === "object") {
+      return { ...TEMA_PADRAO, ...data.valor };
+    }
+  } catch {
+    /* fallback abaixo */
+  }
+  return TEMA_PADRAO;
 }
 
 export async function getDepoimentos(): Promise<

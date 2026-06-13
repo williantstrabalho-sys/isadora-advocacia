@@ -25,50 +25,51 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // Paleta da marca — derivada do logo
+        // Paleta da marca — variáveis CSS (editáveis em runtime pelo tema).
+        // Os valores padrão ficam em globals.css :root.
         brand: {
-          bg: "#0a0a0a",
-          surface: "#111111",
-          elevated: "#1a1a1a",
-          accent: "#d4691e",
-          "accent-hover": "#e8842b",
-          text: "#f0f0f0",
-          muted: "#8a8a8a",
-          border: "#2a2a2a",
+          bg: "rgb(var(--brand-bg) / <alpha-value>)",
+          surface: "rgb(var(--brand-surface) / <alpha-value>)",
+          elevated: "rgb(var(--brand-elevated) / <alpha-value>)",
+          accent: "rgb(var(--brand-accent) / <alpha-value>)",
+          "accent-hover": "rgb(var(--brand-accent-hover) / <alpha-value>)",
+          text: "rgb(var(--brand-text) / <alpha-value>)",
+          muted: "rgb(var(--brand-muted) / <alpha-value>)",
+          border: "rgb(var(--brand-border) / <alpha-value>)",
         },
-        // Tokens shadcn mapeados para a marca
-        border: "#2a2a2a",
-        input: "#2a2a2a",
-        ring: "#d4691e",
-        background: "#0a0a0a",
-        foreground: "#f0f0f0",
+        // Tokens shadcn mapeados para as mesmas variáveis da marca
+        border: "rgb(var(--brand-border) / <alpha-value>)",
+        input: "rgb(var(--brand-border) / <alpha-value>)",
+        ring: "rgb(var(--brand-accent) / <alpha-value>)",
+        background: "rgb(var(--brand-bg) / <alpha-value>)",
+        foreground: "rgb(var(--brand-text) / <alpha-value>)",
         primary: {
-          DEFAULT: "#d4691e",
-          foreground: "#0a0a0a",
+          DEFAULT: "rgb(var(--brand-accent) / <alpha-value>)",
+          foreground: "rgb(var(--brand-bg) / <alpha-value>)",
         },
         secondary: {
-          DEFAULT: "#1a1a1a",
-          foreground: "#f0f0f0",
+          DEFAULT: "rgb(var(--brand-elevated) / <alpha-value>)",
+          foreground: "rgb(var(--brand-text) / <alpha-value>)",
         },
         destructive: {
           DEFAULT: "#dc2626",
           foreground: "#f0f0f0",
         },
         muted: {
-          DEFAULT: "#111111",
-          foreground: "#8a8a8a",
+          DEFAULT: "rgb(var(--brand-surface) / <alpha-value>)",
+          foreground: "rgb(var(--brand-muted) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "#1a1a1a",
-          foreground: "#f0f0f0",
+          DEFAULT: "rgb(var(--brand-elevated) / <alpha-value>)",
+          foreground: "rgb(var(--brand-text) / <alpha-value>)",
         },
         popover: {
-          DEFAULT: "#111111",
-          foreground: "#f0f0f0",
+          DEFAULT: "rgb(var(--brand-surface) / <alpha-value>)",
+          foreground: "rgb(var(--brand-text) / <alpha-value>)",
         },
         card: {
-          DEFAULT: "#111111",
-          foreground: "#f0f0f0",
+          DEFAULT: "rgb(var(--brand-surface) / <alpha-value>)",
+          foreground: "rgb(var(--brand-text) / <alpha-value>)",
         },
       },
       fontFamily: {

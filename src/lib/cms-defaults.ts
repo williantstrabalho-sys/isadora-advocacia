@@ -2,7 +2,10 @@
 // admin em /dashboard/conteudo; estes valores são usados quando ainda não há
 // conteúdo salvo no banco — garantindo que o site nunca fique vazio.
 
+import { TEMA_PADRAO, type Tema } from "@/lib/cores";
+
 export type ConteudoSite = {
+  tema: Tema;
   hero: {
     titulo: string;
     destaque: string;
@@ -43,6 +46,7 @@ export type ConteudoSite = {
 };
 
 export const CONTEUDO_PADRAO: ConteudoSite = {
+  tema: TEMA_PADRAO,
   hero: {
     titulo: "Defesa técnica dos seus",
     destaque: "direitos trabalhistas",

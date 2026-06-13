@@ -5,6 +5,16 @@
 @layer base {
   :root {
     color-scheme: dark;
+    /* Paleta da marca (padrão), em canais RGB para suportar opacidade
+       (rgb(var() / <alpha-value>)). Sobrescrita em runtime pelo tema salvo. */
+    --brand-bg: 10 10 10;
+    --brand-surface: 17 17 17;
+    --brand-elevated: 26 26 26;
+    --brand-accent: 212 105 30;
+    --brand-accent-hover: 232 132 43;
+    --brand-text: 240 240 240;
+    --brand-muted: 138 138 138;
+    --brand-border: 42 42 42;
   }
 
   * {
