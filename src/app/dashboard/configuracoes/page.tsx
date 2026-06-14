@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { salvarConfig } from "./actions";
 import { ExpandableCard } from "./expandable-card";
+import { IAToggle } from "./ia-toggle";
+import { getIAHabilitada, temChaveIA } from "@/lib/ia";
 import { TemaEditor } from "../conteudo/tema-editor";
 import {
   HeroEditor,
@@ -63,6 +65,8 @@ export default async function DashboardConfiguracoes() {
   };
 
   const c = await getConteudo();
+  const iaHabilitada = await getIAHabilitada();
+  const iaTemChave = temChaveIA();
 
   return (
     <>
@@ -130,6 +134,34 @@ export default async function DashboardConfiguracoes() {
 
         {/* Cores do site e do sistema (tema) */}
         <TemaEditor logoUrl={c.imagens.logo} temaInicial={c.tema} />
+
+        {/* Assistente de IA (opcional, gera custo por uso) */}
+        <ExpandableCard
+          title="Assistente de IA"
+          description="Resumo de intimações e redação assistida. Opcional — gera custo por uso."
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="max-w-md">
+              <p className="text-sm text-brand-text/90">
+                Quando ativado, a equipe pode usar a IA para resumir textos,
+                revisar e redigir minutas.
+              </p>
+              <p className="mt-2 text-xs text-brand-muted">
+                Cobrado por uso (centavos por operação). Requer a chave de API no
+                servidor:{" "}
+                {iaTemChave ? (
+                  <span className="text-emerald-400">configurada ✓</span>
+                ) : (
+                  <span className="text-amber-400">
+                    pendente (ANTHROPIC_API_KEY) — sem ela, permanece desligado
+                  </span>
+                )}
+                .
+              </p>
+            </div>
+            <IAToggle inicial={iaHabilitada} />
+          </div>
+        </ExpandableCard>
 
         {/* Conteúdo da página inicial (CMS) — fechado por padrão (extenso) */}
         <ExpandableCard
