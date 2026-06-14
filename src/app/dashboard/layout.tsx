@@ -11,6 +11,7 @@ const NAV_ADMIN: NavItem[] = [
   { href: "/dashboard/financeiro", label: "Financeiro", icon: "DollarSign" },
   { href: "/dashboard/agenda", label: "Agenda", icon: "Calendar" },
   { href: "/dashboard/documentos", label: "Documentos", icon: "FolderOpen" },
+  { href: "/dashboard/modelos", label: "Documentos modelo", icon: "FileSignature" },
   { href: "/dashboard/licoes", label: "Lições aprendidas", icon: "BookOpen" },
   { href: "/dashboard/mensagens", label: "Atendimento", icon: "MessageSquare" },
   { href: "/dashboard/configuracoes", label: "Configurações", icon: "Settings" },

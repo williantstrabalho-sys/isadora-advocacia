@@ -205,6 +205,15 @@ export type Depoimento = {
   created_at: string;
 };
 
+export type ModeloDocumento = {
+  id: string;
+  nome: string;
+  categoria: string | null;
+  conteudo: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Contato = {
   id: string;
   nome: string;
@@ -240,6 +249,7 @@ export type Database = {
       contatos: TableDef<Contato>;
       configuracoes: TableDef<Configuracao>;
       depoimentos: TableDef<Depoimento>;
+      modelos_documento: TableDef<ModeloDocumento>;
     };
     Views: { [key: string]: never };
     Functions: {
